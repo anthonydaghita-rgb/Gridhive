@@ -54,22 +54,35 @@ export function DashboardPage() {
   const [renameValue, setRenameValue] = useState('')
   const [showOrgDropdown, setShowOrgDropdown] = useState(false)
 
-  // Load user's orgs on mount
+  // Load user's orgs on mount — auto-create a personal workspace if none exist
   useEffect(() => {
     if (!user) return
-    api.get<Organization[]>('/orgs').then(orgsList => {
-      const list = Array.isArray(orgsList) ? orgsList : []
+    api.get<Organization[]>('/orgs').then(async orgsList => {
+      let list = Array.isArray(orgsList) ? orgsList : []
+
+      if (list.length === 0) {
+        // First-time user: create a personal workspace automatically
+        const slug = `workspace-${user.id.slice(0, 8)}`
+        try {
+          const newOrg = await api.post<Organization>('/orgs', {
+            name: `${user.name}'s Workspace`,
+            slug,
+          })
+          list = [newOrg]
+        } catch {
+          setLoading(false)
+          return
+        }
+      }
+
       setOrgs(list)
-      // Restore last selected org from localStorage, or default to first
       const stored = localStorage.getItem('gridhive-selected-org')
       const match = stored ? list.find(o => o.id === stored) : null
       if (match) {
         setSelectedOrgId(match.id)
-      } else if (list.length > 0) {
+      } else {
         setSelectedOrgId(list[0].id)
         localStorage.setItem('gridhive-selected-org', list[0].id)
-      } else {
-        setLoading(false)
       }
     }).catch(() => setLoading(false))
   }, [user])
