@@ -65,7 +65,7 @@ export function DashboardPage() {
 
       if (list.length === 0) {
         // First-time user: create a personal workspace automatically
-        const slug = `workspace-${user.id.slice(0, 8)}`
+        const slug = `workspace-${user.id.slice(0, 8).toLowerCase()}`
         try {
           const newOrg = await api.post<Organization>('/orgs', {
             name: `${user.name}'s Workspace`,
@@ -98,7 +98,7 @@ export function DashboardPage() {
   const handleCreateOrg = async () => {
     if (!user || !createOrgName.trim()) return
     setCreateOrgError('')
-    const slug = `workspace-${user.id.slice(0, 8)}`
+    const slug = `workspace-${user.id.slice(0, 8).toLowerCase()}`
     try {
       const newOrg = await api.post<Organization>('/orgs', {
         name: createOrgName.trim(),
