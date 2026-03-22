@@ -44,12 +44,21 @@ export function AdminPage() {
   useEffect(() => {
     async function loadOrg() {
       try {
-        // Get first org the user belongs to via the projects API
-        // We'll try fetching org list or use a session-stored org ID
-        const stored = localStorage.getItem('gridhive-selected-org')
-        if (stored) {
-          setOrgId(stored)
-          const orgData = await api.get<OrgData>(`/orgs/${stored}`)
+        // Try localStorage first, fall back to fetching the user's org list
+        let resolvedOrgId = localStorage.getItem('gridhive-selected-org')
+
+        if (!resolvedOrgId) {
+          const orgs = await api.get<OrgData[]>('/orgs')
+          const list = Array.isArray(orgs) ? orgs : []
+          if (list.length > 0) {
+            resolvedOrgId = list[0].id
+            localStorage.setItem('gridhive-selected-org', resolvedOrgId)
+          }
+        }
+
+        if (resolvedOrgId) {
+          setOrgId(resolvedOrgId)
+          const orgData = await api.get<OrgData>(`/orgs/${resolvedOrgId}`)
           if (orgData) {
             setOrg(orgData)
             setMembers(orgData.members || [])

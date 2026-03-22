@@ -53,6 +53,9 @@ export function DashboardPage() {
   const [renamingFolder, setRenamingFolder] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState('')
   const [showOrgDropdown, setShowOrgDropdown] = useState(false)
+  const [showCreateOrg, setShowCreateOrg] = useState(false)
+  const [createOrgName, setCreateOrgName] = useState('')
+  const [createOrgError, setCreateOrgError] = useState('')
 
   // Load user's orgs on mount — auto-create a personal workspace if none exist
   useEffect(() => {
@@ -70,6 +73,8 @@ export function DashboardPage() {
           })
           list = [newOrg]
         } catch {
+          // Auto-create failed — show manual org creation UI
+          setShowCreateOrg(true)
           setLoading(false)
           return
         }
@@ -84,8 +89,31 @@ export function DashboardPage() {
         setSelectedOrgId(list[0].id)
         localStorage.setItem('gridhive-selected-org', list[0].id)
       }
-    }).catch(() => setLoading(false))
+    }).catch(() => {
+      setShowCreateOrg(true)
+      setLoading(false)
+    })
   }, [user])
+
+  const handleCreateOrg = async () => {
+    if (!user || !createOrgName.trim()) return
+    setCreateOrgError('')
+    const slug = `workspace-${user.id.slice(0, 8)}`
+    try {
+      const newOrg = await api.post<Organization>('/orgs', {
+        name: createOrgName.trim(),
+        slug,
+      })
+      const list = [newOrg]
+      setOrgs(list)
+      setSelectedOrgId(newOrg.id)
+      localStorage.setItem('gridhive-selected-org', newOrg.id)
+      setShowCreateOrg(false)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to create workspace'
+      setCreateOrgError(msg)
+    }
+  }
 
   const loadData = useCallback(async () => {
     if (!selectedOrgId) return
@@ -234,6 +262,48 @@ export function DashboardPage() {
       if (sortBy === 'created') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     })
+
+  // Show workspace creation screen if no org exists and auto-create failed
+  if (showCreateOrg) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 w-full max-w-md space-y-6">
+          <div>
+            <h1 className="text-2xl font-bold">Welcome to Gridhive</h1>
+            <p className="text-gray-400 mt-1">Create a workspace to get started.</p>
+          </div>
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-300">Workspace name</label>
+            <input
+              type="text"
+              value={createOrgName}
+              onChange={e => setCreateOrgName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleCreateOrg()}
+              placeholder={`${user?.name}'s Workspace`}
+              autoFocus
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+            />
+            {createOrgError && (
+              <p className="text-red-400 text-sm">{createOrgError}</p>
+            )}
+          </div>
+          <button
+            onClick={handleCreateOrg}
+            disabled={!createOrgName.trim()}
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 rounded-lg font-medium transition-colors"
+          >
+            Create Workspace
+          </button>
+          <button
+            onClick={handleLogout}
+            className="w-full text-gray-500 hover:text-gray-300 text-sm transition-colors"
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col" onClick={() => setContextMenu(null)}>
