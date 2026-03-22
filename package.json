@@ -20,6 +20,9 @@
       "@prisma/engines",
       "esbuild",
       "prisma"
-    ]
+    ],
+    "overrides": {
+      "@fastify/cors": "^10.0.1"
+    }
   }
 }
