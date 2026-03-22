@@ -5,7 +5,8 @@ import { requireAuth } from '../../plugins/auth.js'
 const authModule: FastifyPluginAsync = async (fastify) => {
   // Delegate all /auth/* requests to better-auth
   fastify.all('/*', async (request, reply) => {
-    const url = new URL(request.url, `http://${request.hostname}`)
+    const proto = (request.headers['x-forwarded-proto'] as string) || 'http'
+    const url = new URL(request.url, `${proto}://${request.hostname}`)
     const req = new Request(url.toString(), {
       method: request.method,
       headers: request.headers as Record<string, string>,
