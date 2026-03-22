@@ -2,6 +2,8 @@ import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import cookie from '@fastify/cookie'
 import { config } from 'dotenv'
+import { resolve } from 'path'
+import { ConfigWatcher } from './lib/config-watcher/ConfigWatcher.js'
 
 config()
 
@@ -36,6 +38,7 @@ export async function buildApp() {
   await app.register(import('./modules/templates/index.js'), { prefix: '/templates' })
   await app.register(import('./modules/validation/index.js'), { prefix: '/validate' })
   await app.register(import('./modules/simulation/index.js'), { prefix: '/simulate' })
+  await app.register(import('./modules/admin/index.js'), { prefix: '/admin' })
 
   return app
 }
@@ -48,6 +51,16 @@ async function main() {
   try {
     await app.listen({ port, host })
     console.log(`Gridhive API running on http://${host}:${port}`)
+
+    // Start config watcher after server is up
+    const configDir = resolve(process.env.CONFIG_DIR || 'config')
+    const watcher = new ConfigWatcher(configDir, app.prisma, (msg) => app.log.info(msg))
+    app.decorate('configWatcher', watcher)
+    watcher.start()
+
+    app.addHook('onClose', async () => {
+      await watcher.stop()
+    })
   } catch (err) {
     app.log.error(err)
     process.exit(1)

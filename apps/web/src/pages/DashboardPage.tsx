@@ -37,6 +37,9 @@ export function DashboardPage() {
         <h1 className="text-xl font-bold text-blue-400">Gridhive</h1>
         <div className="flex items-center gap-4">
           <span className="text-gray-400 text-sm">{user?.name}</span>
+          <button onClick={() => navigate('/admin')} className="text-gray-400 hover:text-white text-sm">
+            Admin
+          </button>
           <button onClick={handleLogout} className="text-gray-400 hover:text-white text-sm">
             Sign Out
           </button>
