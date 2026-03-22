@@ -6,11 +6,6 @@ import { requireAuth } from '../../plugins/auth.js'
 import { ConfigPayloadSchema } from '../../lib/config-watcher/schemas.js'
 import { configStore } from '../../lib/config-watcher/ConfigStore.js'
 
-declare module 'fastify' {
-  interface FastifyInstance {
-    configWatcher?: import('../../lib/config-watcher/ConfigWatcher.js').ConfigWatcher
-  }
-}
 
 const CONFIG_DIR = resolve(process.env.CONFIG_DIR || 'config')
 

@@ -2,6 +2,7 @@ import { FastifyPluginAsync } from 'fastify'
 import { requireAuth } from '../../plugins/auth.js'
 import { z } from 'zod'
 import { TopologySnapshotSchema } from '@gridhive/shared'
+import type { Prisma } from '@prisma/client'
 
 const templatesModule: FastifyPluginAsync = async (fastify) => {
   // GET /templates
@@ -78,10 +79,10 @@ const templatesModule: FastifyPluginAsync = async (fastify) => {
         slug: newSlug,
         description: template.description,
         category: template.category,
-        topology: template.topology,
+        topology: template.topology as Prisma.InputJsonValue,
         tags: template.tags,
         difficulty: template.difficulty,
-        simTestSuite: template.simTestSuite,
+        simTestSuite: template.simTestSuite as Prisma.InputJsonValue,
         createdBy: request.user!.id,
       },
     })
