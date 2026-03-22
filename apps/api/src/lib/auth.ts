@@ -20,7 +20,8 @@ export const auth = betterAuth({
   },
   trustedOrigins: [process.env.CORS_ORIGIN || 'http://localhost:5173'],
   secret: process.env.AUTH_SECRET || 'fallback-secret-32-chars-long-xyz',
-  baseURL: process.env.AUTH_URL || 'http://localhost:3001',
+  baseURL: process.env.AUTH_URL || 'http://localhost:3002',
+  basePath: '/auth',
 })
 
 export type Auth = typeof auth
