@@ -1,0 +1,219 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String?
+  emailVerified Boolean @default(false)
+  image        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orgMembers   OrgMember[]
+  projects     Project[]    @relation("ProjectCreator")
+  versions     ProjectVersion[] @relation("VersionCreator")
+  validations  ValidationRun[]
+  simulations  SimulationRun[]
+  templates    Template[]
+  auditLogs    AuditLog[]
+  sessions     Session[]
+  accounts     Account[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  accountId         String
+  providerId        String
+  accessToken       String?
+  refreshToken      String?
+  accessTokenExpiresAt DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope             String?
+  idToken           String?
+  password          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("accounts")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verifications")
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  members    OrgMember[]
+  projects   Project[]
+  templates  Template[]
+  auditLogs  AuditLog[]
+
+  @@map("organizations")
+}
+
+model OrgMember {
+  id       String   @id @default(cuid())
+  orgId    String
+  userId   String
+  role     String   @default("member")
+  joinedAt DateTime @default(now())
+
+  org  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, userId])
+  @@map("org_members")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  orgId       String
+  name        String
+  description String?
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  archived    Boolean  @default(false)
+
+  org         Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  creator     User             @relation("ProjectCreator", fields: [createdBy], references: [id])
+  versions    ProjectVersion[]
+  validations ValidationRun[]
+  simulations SimulationRun[]
+  auditLogs   AuditLog[]
+
+  @@map("projects")
+}
+
+model ProjectVersion {
+  id            String   @id @default(cuid())
+  projectId     String
+  versionNumber Int
+  label         String?
+  topology      Json
+  createdBy     String
+  createdAt     DateTime @default(now())
+  isAutosave    Boolean  @default(false)
+
+  project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creator     User            @relation("VersionCreator", fields: [createdBy], references: [id])
+  validations ValidationRun[]
+  simulations SimulationRun[]
+
+  @@unique([projectId, versionNumber])
+  @@map("project_versions")
+}
+
+model Template {
+  id                  String   @id @default(cuid())
+  orgId               String?
+  name                String
+  slug                String   @unique
+  description         String?
+  category            String
+  isSystem            Boolean  @default(false)
+  topology            Json
+  thumbnail           String?
+  difficulty          String   @default("beginner")
+  tags                String[]
+  validationExpected  String   @default("pass")
+  simTestSuite        Json     @default("[]")
+  createdBy           String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  version             String   @default("1.0.0")
+
+  org     Organization? @relation(fields: [orgId], references: [id], onDelete: SetNull)
+  creator User?         @relation(fields: [createdBy], references: [id])
+
+  @@map("templates")
+}
+
+model ValidationRun {
+  id        String   @id @default(cuid())
+  projectId String
+  versionId String?
+  ranAt     DateTime @default(now())
+  ranBy     String
+  results   Json
+
+  project Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  version ProjectVersion? @relation(fields: [versionId], references: [id])
+  user    User           @relation(fields: [ranBy], references: [id])
+
+  @@map("validation_runs")
+}
+
+model SimulationRun {
+  id        String   @id @default(cuid())
+  projectId String
+  versionId String?
+  ranAt     DateTime @default(now())
+  ranBy     String
+  testCases Json
+  results   Json
+
+  project Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  version ProjectVersion? @relation(fields: [versionId], references: [id])
+  user    User           @relation(fields: [ranBy], references: [id])
+
+  @@map("simulation_runs")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  orgId      String?
+  projectId  String?
+  userId     String
+  action     String
+  entityType String
+  entityId   String?
+  before     Json?
+  after      Json?
+  createdAt  DateTime @default(now())
+
+  org     Organization? @relation(fields: [orgId], references: [id])
+  project Project?      @relation(fields: [projectId], references: [id])
+  user    User          @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
