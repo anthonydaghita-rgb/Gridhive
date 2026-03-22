@@ -5,6 +5,12 @@ import { config } from 'dotenv'
 import { resolve } from 'path'
 import { ConfigWatcher } from './lib/config-watcher/ConfigWatcher.js'
 
+declare module 'fastify' {
+  interface FastifyInstance {
+    configWatcher: ConfigWatcher
+  }
+}
+
 config()
 
 export async function buildApp() {
@@ -40,6 +46,15 @@ export async function buildApp() {
   await app.register(import('./modules/simulation/index.js'), { prefix: '/simulate' })
   await app.register(import('./modules/admin/index.js'), { prefix: '/admin' })
 
+  // Register config watcher before listen (Fastify v5 requires decorate before start)
+  await app.register(async (instance) => {
+    const configDir = resolve(process.env.CONFIG_DIR || 'config')
+    const watcher = new ConfigWatcher(configDir, instance.prisma, (msg) => instance.log.info(msg))
+    instance.decorate('configWatcher', watcher)
+    instance.addHook('onReady', async () => { watcher.start() })
+    instance.addHook('onClose', async () => { await watcher.stop() })
+  })
+
   return app
 }
 
@@ -51,16 +66,6 @@ async function main() {
   try {
     await app.listen({ port, host })
     console.log(`Gridhive API running on http://${host}:${port}`)
-
-    // Start config watcher after server is up
-    const configDir = resolve(process.env.CONFIG_DIR || 'config')
-    const watcher = new ConfigWatcher(configDir, app.prisma, (msg) => app.log.info(msg))
-    app.decorate('configWatcher', watcher)
-    watcher.start()
-
-    app.addHook('onClose', async () => {
-      await watcher.stop()
-    })
   } catch (err) {
     app.log.error(err)
     process.exit(1)
