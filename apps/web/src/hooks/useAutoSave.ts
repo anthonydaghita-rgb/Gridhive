@@ -4,7 +4,7 @@ import { useProjectStore } from '../stores/projectStore'
 import { api } from '../lib/api'
 
 export function useAutoSave(projectId: string | undefined, delay = 30000) {
-  const { getTopologySnapshot } = useCanvasStore()
+  const { getTopologySnapshot, captureCanvasThumbnail } = useCanvasStore()
   const { isDirty, setAutosaving, setLastSavedAt } = useProjectStore()
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -16,10 +16,14 @@ export function useAutoSave(projectId: string | undefined, delay = 30000) {
     timerRef.current = setTimeout(async () => {
       setAutosaving(true)
       try {
-        const topology = getTopologySnapshot()
+        const [topology, thumbnailBase64] = await Promise.all([
+          Promise.resolve(getTopologySnapshot()),
+          captureCanvasThumbnail(),
+        ])
         await api.post(`/projects/${projectId}/versions`, {
           topology,
           isAutosave: true,
+          thumbnailBase64: thumbnailBase64 ?? undefined,
         })
         setLastSavedAt(new Date())
       } catch (err) {

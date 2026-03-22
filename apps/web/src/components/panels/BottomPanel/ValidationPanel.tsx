@@ -37,6 +37,7 @@ export function ValidationPanel() {
     clearHighlights,
     validationNodeStates,
   } = useValidationStore()
+  const { setFitViewNodes } = useCanvasStore()
 
   const errors = validationResults.filter(r => r.severity === 'error')
   const warnings = validationResults.filter(r => r.severity === 'warning')
@@ -45,6 +46,9 @@ export function ValidationPanel() {
   const handleResultClick = (result: ValidationResult) => {
     setHighlightedNodes(result.affectedNodeIds, result.severity)
     setHighlightedEdges(result.affectedEdgeIds)
+    if (result.affectedNodeIds.length > 0) {
+      setFitViewNodes(result.affectedNodeIds)
+    }
   }
 
   if (isValidating) {

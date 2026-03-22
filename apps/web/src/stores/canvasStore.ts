@@ -12,12 +12,15 @@ interface CanvasStore {
   viewport: Viewport
   selectedNodeId: string | null
   selectedEdgeId: string | null
+  fitViewNodeIds: string[] | null
 
   setNodes: (nodes: DeviceNode[] | ((prev: DeviceNode[]) => DeviceNode[])) => void
   setEdges: (edges: ConnectionEdge[] | ((prev: ConnectionEdge[]) => ConnectionEdge[])) => void
   setViewport: (viewport: Viewport) => void
   setSelectedNode: (id: string | null) => void
   setSelectedEdge: (id: string | null) => void
+  setFitViewNodes: (ids: string[]) => void
+  clearFitView: () => void
 
   addNode: (node: DeviceNode) => void
   updateNodeData: (id: string, data: Partial<DeviceData>) => void
@@ -30,6 +33,7 @@ interface CanvasStore {
   loadTopology: (snapshot: TopologySnapshot) => void
   getTopologySnapshot: () => TopologySnapshot
   clearCanvas: () => void
+  captureCanvasThumbnail: () => Promise<string | null>
 }
 
 export const useCanvasStore = create<CanvasStore>()(
@@ -39,6 +43,7 @@ export const useCanvasStore = create<CanvasStore>()(
     viewport: { x: 0, y: 0, zoom: 1 },
     selectedNodeId: null,
     selectedEdgeId: null,
+    fitViewNodeIds: null,
 
     setNodes: (nodes) => set(state => ({
       nodes: typeof nodes === 'function' ? nodes(state.nodes) : nodes,
@@ -52,6 +57,8 @@ export const useCanvasStore = create<CanvasStore>()(
 
     setSelectedNode: (id) => set({ selectedNodeId: id, selectedEdgeId: null }),
     setSelectedEdge: (id) => set({ selectedEdgeId: id, selectedNodeId: null }),
+    setFitViewNodes: (ids) => set({ fitViewNodeIds: ids }),
+    clearFitView: () => set({ fitViewNodeIds: null }),
 
     addNode: (node) => set(state => ({ nodes: [...state.nodes, node] })),
 
@@ -93,5 +100,24 @@ export const useCanvasStore = create<CanvasStore>()(
     },
 
     clearCanvas: () => set({ nodes: [], edges: [], selectedNodeId: null, selectedEdgeId: null }),
+
+    captureCanvasThumbnail: async () => {
+      try {
+        const el = document.getElementById('gridhive-canvas-capture')
+        if (!el) return null
+        const { default: html2canvas } = await import('html2canvas')
+        const canvas = await html2canvas(el, {
+          backgroundColor: '#030712', // gray-950
+          scale: 0.5,
+          useCORS: true,
+          logging: false,
+          width: el.clientWidth,
+          height: el.clientHeight,
+        })
+        return canvas.toDataURL('image/jpeg', 0.7)
+      } catch {
+        return null
+      }
+    },
   })),
 )

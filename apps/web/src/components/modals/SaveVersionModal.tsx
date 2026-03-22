@@ -8,7 +8,7 @@ import { api } from '../../lib/api'
 export function SaveVersionModal() {
   const { closeModal } = useUiStore()
   const { currentProject, setSaving, setLastSavedAt } = useProjectStore()
-  const { getTopologySnapshot } = useCanvasStore()
+  const { getTopologySnapshot, captureCanvasThumbnail } = useCanvasStore()
   const [label, setLabel] = useState('')
   const [saving, setSavingLocal] = useState(false)
 
@@ -20,11 +20,15 @@ export function SaveVersionModal() {
     setSavingLocal(true)
     setSaving(true)
     try {
-      const topology = getTopologySnapshot()
+      const [topology, thumbnailBase64] = await Promise.all([
+        Promise.resolve(getTopologySnapshot()),
+        captureCanvasThumbnail(),
+      ])
       await api.post(`/projects/${currentProject.id}/versions`, {
         label: label.trim() || defaultLabel,
         topology,
         isAutosave: false,
+        thumbnailBase64: thumbnailBase64 ?? undefined,
       })
       setLastSavedAt(new Date())
       closeModal()

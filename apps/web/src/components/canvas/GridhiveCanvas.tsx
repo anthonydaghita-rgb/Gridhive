@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import {
   ReactFlow,
   Background,
@@ -8,6 +8,7 @@ import {
   useNodesState,
   useEdgesState,
   ReactFlowProvider,
+  useReactFlow,
   type Connection,
   type NodeTypes,
   type EdgeTypes,
@@ -20,6 +21,7 @@ import {
 import '@xyflow/react/dist/style.css'
 import { useCanvasStore } from '../../stores/canvasStore'
 import { useProjectStore } from '../../stores/projectStore'
+import { useValidationStore } from '../../stores/validationStore'
 import { FirewallNode } from './nodes/FirewallNode'
 import { SwitchL2Node } from './nodes/SwitchL2Node'
 import { SwitchL3Node } from './nodes/SwitchL3Node'
@@ -71,9 +73,23 @@ function Canvas() {
     setNodes, setEdges, setViewport,
     setSelectedNode, setSelectedEdge,
     addEdge: storeAddEdge, addNode,
+    fitViewNodeIds, clearFitView,
   } = useCanvasStore()
   const { setDirty } = useProjectStore()
+  const { isValidating, isSimulating } = useValidationStore()
+  const { fitView } = useReactFlow()
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
+
+  // Pan-and-zoom to highlighted nodes when fitViewNodeIds is set
+  useEffect(() => {
+    if (!fitViewNodeIds || fitViewNodeIds.length === 0) return
+    fitView({
+      nodes: fitViewNodeIds.map(id => ({ id })),
+      padding: 0.4,
+      duration: 400,
+    })
+    clearFitView()
+  }, [fitViewNodeIds, fitView, clearFitView])
 
   const onConnect: OnConnect = useCallback((connection: Connection) => {
     const newEdge: Edge<ConnectionData> = {
@@ -130,7 +146,11 @@ function Canvas() {
   }, [])
 
   return (
-    <div ref={reactFlowWrapper} className="w-full h-full">
+    <div ref={reactFlowWrapper} id="gridhive-canvas-capture" className="w-full h-full relative">
+      {/* Dim overlay during validation / simulation */}
+      {(isValidating || isSimulating) && (
+        <div className="absolute inset-0 bg-black/15 z-10 pointer-events-none transition-opacity duration-300" />
+      )}
       <ReactFlow
         nodes={nodes}
         edges={edges}
