@@ -7,8 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@gridhive/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
-    },
+},
   },
   server: {
     port: 5173,
