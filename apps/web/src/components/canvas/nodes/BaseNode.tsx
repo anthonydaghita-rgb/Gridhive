@@ -1,16 +1,16 @@
 import { type ReactNode } from 'react'
-import { Handle, Position, type NodeProps } from '@xyflow/react'
+import { Handle, Position, type Node, type NodeProps } from '@xyflow/react'
 import type { DeviceData } from '@gridhive/shared'
 import { useValidationStore } from '../../../stores/validationStore'
 import { useCanvasStore } from '../../../stores/canvasStore'
 
-interface BaseNodeProps extends NodeProps<{ data: DeviceData }> {
+interface BaseNodeProps extends NodeProps<Node<DeviceData>> {
   icon: ReactNode
   color: string
   borderColor?: string
 }
 
-export function BaseNode({ id, data, selected, icon, color, borderColor }: BaseNodeProps & { data: DeviceData }) {
+export function BaseNode({ id, data, selected, icon, color, borderColor }: BaseNodeProps) {
   const { highlightedNodeIds } = useValidationStore()
   const isHighlighted = highlightedNodeIds.includes(id)
 

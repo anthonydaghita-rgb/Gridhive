@@ -1,5 +1,6 @@
-import { useCallback, useRef } from 'react'
-import ReactFlow, {
+import React, { useCallback, useRef } from 'react'
+import {
+  ReactFlow,
   Background,
   Controls,
   MiniMap,
@@ -11,6 +12,9 @@ import ReactFlow, {
   type NodeTypes,
   type EdgeTypes,
   type OnConnect,
+  type NodeChange,
+  type EdgeChange,
+  type Viewport,
   BackgroundVariant,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
@@ -130,7 +134,7 @@ function Canvas() {
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={(changes) => {
+        onNodesChange={(changes: NodeChange[]) => {
           setNodes((prev) => {
             const next = [...prev]
             for (const change of changes) {
@@ -144,9 +148,9 @@ function Canvas() {
             }
             return next
           })
-          if (changes.some(c => c.type !== 'select')) setDirty(true)
+          if (changes.some((c: NodeChange) => c.type !== 'select')) setDirty(true)
         }}
-        onEdgesChange={(changes) => {
+        onEdgesChange={(changes: EdgeChange[]) => {
           setEdges((prev) => {
             const next = [...prev]
             for (const change of changes) {
@@ -157,13 +161,13 @@ function Canvas() {
             }
             return next
           })
-          if (changes.some(c => c.type !== 'select')) setDirty(true)
+          if (changes.some((c: EdgeChange) => c.type !== 'select')) setDirty(true)
         }}
         onConnect={onConnect}
-        onNodeClick={(_, node) => setSelectedNode(node.id)}
-        onEdgeClick={(_, edge) => setSelectedEdge(edge.id)}
+        onNodeClick={(_: React.MouseEvent, node: Node) => setSelectedNode(node.id)}
+        onEdgeClick={(_: React.MouseEvent, edge: Edge) => setSelectedEdge(edge.id)}
         onPaneClick={() => { setSelectedNode(null); setSelectedEdge(null) }}
-        onMoveEnd={(_, vp) => setViewport(vp)}
+        onMoveEnd={(_: MouseEvent | TouchEvent | null, vp: Viewport) => setViewport(vp)}
         onDrop={onDrop}
         onDragOver={onDragOver}
         nodeTypes={nodeTypes}

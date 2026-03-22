@@ -1,4 +1,4 @@
-import { BaseEdge, EdgeLabelRenderer, getBezierPath, type EdgeProps } from '@xyflow/react'
+import { BaseEdge, EdgeLabelRenderer, getBezierPath, type Edge, type EdgeProps } from '@xyflow/react'
 import type { ConnectionData } from '@gridhive/shared'
 
 const STATUS_COLORS = {
@@ -21,7 +21,7 @@ export function NetworkEdge({
   id, sourceX, sourceY, targetX, targetY,
   sourcePosition, targetPosition,
   data, selected,
-}: EdgeProps<ConnectionData>) {
+}: EdgeProps<Edge<ConnectionData>>) {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX, sourceY, sourcePosition,
     targetX, targetY, targetPosition,

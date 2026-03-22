@@ -31,7 +31,7 @@ export function ComponentLibrary() {
         <div key={category}>
           <h3 className="text-xs text-gray-500 mb-2 font-medium">{category}</h3>
           <div className="grid grid-cols-2 gap-1.5">
-            {(devices as string[]).map((deviceType) => (
+            {(devices as readonly string[]).map((deviceType) => (
               <DraggableDeviceIcon
                 key={deviceType}
                 deviceType={deviceType as DeviceType}

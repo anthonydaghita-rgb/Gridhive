@@ -48,6 +48,8 @@ export interface DeviceData {
   location?: string
   rackPosition?: string
   portMappings?: PortMapping[]
+  poe?: boolean
+  [key: string]: unknown
 }
 
 export interface ConnectionData {
@@ -63,6 +65,7 @@ export interface ConnectionData {
   notes?: string
   label?: string
   protocol?: string
+  [key: string]: unknown
 }
 
 export interface DeviceNode {
