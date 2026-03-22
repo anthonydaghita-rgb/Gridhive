@@ -7,11 +7,24 @@ export class ApiError extends Error {
   }
 }
 
+function getToken(): string | null {
+  try {
+    const stored = localStorage.getItem('gridhive-auth')
+    if (!stored) return null
+    const parsed = JSON.parse(stored)
+    return parsed?.state?.token ?? null
+  } catch {
+    return null
+  }
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = getToken()
   const response = await fetch(`${API_BASE}${path}`, {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,
     },
     ...options,
@@ -44,12 +57,12 @@ export const api = {
 
   auth: {
     login: (email: string, password: string) =>
-      request<{ user: { id: string; email: string; name: string } }>('/auth/sign-in/email', {
+      request<{ token?: string; user: { id: string; email: string; name: string } }>('/auth/sign-in/email', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       }),
     register: (email: string, password: string, name: string) =>
-      request<{ user: { id: string; email: string; name: string } }>('/auth/sign-up/email', {
+      request<{ token?: string; user: { id: string; email: string; name: string } }>('/auth/sign-up/email', {
         method: 'POST',
         body: JSON.stringify({ email, password, name }),
       }),
