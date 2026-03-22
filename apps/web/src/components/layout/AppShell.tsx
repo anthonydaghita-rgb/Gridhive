@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { TopToolbar } from '../toolbar/TopToolbar'
 import { ComponentLibrary } from '../panels/LeftPanel/ComponentLibrary'
 import { PropertiesInspector } from '../panels/RightPanel/PropertiesInspector'
@@ -8,10 +8,24 @@ import { GridhiveCanvas } from '../canvas/GridhiveCanvas'
 import { NewProjectModal } from '../modals/NewProjectModal'
 import { TemplateLibraryModal } from '../modals/TemplateLibraryModal'
 import { ExportModal } from '../modals/ExportModal'
+import { VersionHistoryModal } from '../modals/VersionHistoryModal'
+import { SaveVersionModal } from '../modals/SaveVersionModal'
+import { ProjectSettingsModal } from '../modals/ProjectSettingsModal'
 import { useUiStore } from '../../stores/uiStore'
+import { useProjectStore } from '../../stores/projectStore'
+import { api } from '../../lib/api'
 
 export function AppShell() {
-  const { leftPanelOpen, rightPanelOpen, bottomPanelOpen, bottomPanelTab, activeModal } = useUiStore()
+  const { leftPanelOpen, rightPanelOpen, bottomPanelOpen, bottomPanelTab, activeModal, setOrgLogo } = useUiStore()
+  const { currentProject } = useProjectStore()
+
+  // Load org logo when project is loaded
+  useEffect(() => {
+    if (!currentProject?.orgId) return
+    api.get<{ logoBase64?: string | null }>(`/orgs/${currentProject.orgId}`)
+      .then(org => setOrgLogo(org?.logoBase64 ?? null))
+      .catch(() => setOrgLogo(null))
+  }, [currentProject?.orgId, setOrgLogo])
 
   return (
     <div className="h-screen flex flex-col bg-gray-950 text-white overflow-hidden">
@@ -57,6 +71,9 @@ export function AppShell() {
       {activeModal === 'new-project' && <NewProjectModal />}
       {activeModal === 'template-library' && <TemplateLibraryModal />}
       {activeModal === 'export' && <ExportModal />}
+      {activeModal === 'version-history' && <VersionHistoryModal />}
+      {activeModal === 'save-version' && <SaveVersionModal />}
+      {activeModal === 'project-settings' && <ProjectSettingsModal />}
     </div>
   )
 }

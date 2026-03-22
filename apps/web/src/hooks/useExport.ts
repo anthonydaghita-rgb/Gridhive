@@ -1,11 +1,17 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { useCanvasStore } from '../stores/canvasStore'
 import { useValidationStore } from '../stores/validationStore'
+import { useProjectStore } from '../stores/projectStore'
+import { useAuthStore } from '../stores/authStore'
 import type { ValidationResult } from '@gridhive/shared'
+import type { PDFOptions } from '../components/export/PDFGenerator'
 
 export function useExport() {
   const { getTopologySnapshot, nodes } = useCanvasStore()
-  const { validationResults } = useValidationStore()
+  const { validationResults, simulationResults, lastValidatedAt, lastSimulatedAt } = useValidationStore()
+  const { currentProject } = useProjectStore()
+  const { user } = useAuthStore()
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
 
   const exportJSON = useCallback(() => {
     const snapshot = getTopologySnapshot()
@@ -53,7 +59,7 @@ export function useExport() {
       for (const r of results as ValidationResult[]) {
         lines.push(`[${r.code}] ${r.title}`)
         lines.push(`  ${r.description}`)
-        lines.push(`  → ${r.recommendation}`)
+        lines.push(`  -> ${r.recommendation}`)
         lines.push('')
       }
     }
@@ -66,7 +72,31 @@ export function useExport() {
     downloadBlob(blob, 'validation-report.txt')
   }, [validationResults])
 
-  return { exportJSON, exportCSV, exportValidationReport }
+  const exportPDF = useCallback(async (options: PDFOptions) => {
+    setIsGeneratingPDF(true)
+    try {
+      const topology = getTopologySnapshot()
+      const { generatePDF } = await import('../components/export/PDFGenerator')
+
+      await generatePDF({
+        projectName: currentProject?.name || 'Untitled Project',
+        orgName: 'Gridhive',
+        userName: user?.name || 'Unknown',
+        topology,
+        validationResults,
+        simulationResults,
+        simulationTests: [],
+        lastValidatedAt,
+        lastSimulatedAt,
+      }, options)
+    } catch (err) {
+      console.error('PDF generation failed:', err)
+    } finally {
+      setIsGeneratingPDF(false)
+    }
+  }, [getTopologySnapshot, currentProject, user, validationResults, simulationResults, lastValidatedAt, lastSimulatedAt])
+
+  return { exportJSON, exportCSV, exportValidationReport, exportPDF, isGeneratingPDF }
 }
 
 function downloadBlob(blob: Blob, filename: string) {

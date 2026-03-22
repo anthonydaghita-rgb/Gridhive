@@ -52,6 +52,39 @@ export interface DeviceData {
   [key: string]: unknown
 }
 
+export type NetworkProtocol =
+  // WAN and tunneling
+  | 'mpls'
+  | 'sd-wan'
+  | 'site-to-site-vpn'
+  | 'ssl-vpn'
+  | 'gre-tunnel'
+  | 'wireguard'
+  // Routing protocols
+  | 'ospf'
+  | 'bgp'
+  | 'eigrp'
+  | 'rip'
+  | 'static-route'
+  // Industrial
+  | 'profinet'
+  | 'ethernet-ip'
+  | 'modbus-tcp'
+  | 'bacnet'
+  | 'dnp3'
+  // Storage
+  | 'iscsi'
+  | 'fibre-channel'
+  | 'nfs'
+  | 'smb'
+  // Management
+  | 'snmp'
+  | 'netflow'
+  | 'syslog'
+  // Other
+  | 'none'
+  | 'custom'
+
 export interface ConnectionData {
   sourcePort?: string
   targetPort?: string
@@ -65,6 +98,8 @@ export interface ConnectionData {
   notes?: string
   label?: string
   protocol?: string
+  protocols?: NetworkProtocol[]
+  customProtocol?: string
   [key: string]: unknown
 }
 
@@ -213,10 +248,15 @@ export interface Project {
   orgId: string
   name: string
   description?: string
+  clientName?: string
+  tags?: string[]
+  folderId?: string | null
   createdBy: string
   createdAt: Date
   updatedAt: Date
   archived: boolean
+  archivedAt?: Date | null
+  archivedBy?: string | null
 }
 
 export interface ProjectVersion {

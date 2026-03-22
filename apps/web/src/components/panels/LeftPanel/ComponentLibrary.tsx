@@ -1,26 +1,7 @@
 import { DEVICE_CATEGORIES, DEVICE_DISPLAY_NAMES } from '@gridhive/shared'
 import { DraggableDeviceIcon } from './DraggableDeviceIcon'
 import type { DeviceType } from '@gridhive/shared'
-
-const DEVICE_ICONS: Record<string, string> = {
-  'firewall': '🔥',
-  'firewall-edge': '🔥',
-  'switch-l2': '🔀',
-  'switch-l3': '🔄',
-  'router': '🌐',
-  'server': '🖥',
-  'workstation': '💻',
-  'wireless-ap': '📡',
-  'camera': '📷',
-  'voip-phone': '📞',
-  'printer': '🖨',
-  'nas': '💾',
-  'internet': '🌍',
-  'plc': '⚙️',
-  'sensor': '📟',
-  'hmi': '🖱',
-  'patch-panel': '🔌',
-}
+import { getDeviceIcon } from '../../../lib/icons'
 
 export function ComponentLibrary() {
   return (
@@ -36,7 +17,7 @@ export function ComponentLibrary() {
                 key={deviceType}
                 deviceType={deviceType as DeviceType}
                 label={DEVICE_DISPLAY_NAMES[deviceType] || deviceType}
-                icon={DEVICE_ICONS[deviceType] || '📦'}
+                icon={getDeviceIcon(deviceType as DeviceType, { size: 18 })}
               />
             ))}
           </div>

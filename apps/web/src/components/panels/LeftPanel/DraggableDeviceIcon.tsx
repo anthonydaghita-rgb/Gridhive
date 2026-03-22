@@ -1,9 +1,10 @@
+import type { ReactNode } from 'react'
 import type { DeviceType } from '@gridhive/shared'
 
 interface DraggableDeviceIconProps {
   deviceType: DeviceType
   label: string
-  icon: string
+  icon: ReactNode
 }
 
 export function DraggableDeviceIcon({ deviceType, label, icon }: DraggableDeviceIconProps) {
@@ -19,7 +20,9 @@ export function DraggableDeviceIcon({ deviceType, label, icon }: DraggableDevice
       className="flex flex-col items-center gap-1 p-2 rounded-lg bg-gray-800 hover:bg-gray-700 cursor-grab active:cursor-grabbing transition-colors border border-gray-700 hover:border-gray-600"
       title={`Drag to add ${label}`}
     >
-      <span className="text-xl">{icon}</span>
+      <div className="w-6 h-6 flex items-center justify-center text-gray-300">
+        {icon}
+      </div>
       <span className="text-[10px] text-gray-300 text-center leading-tight">{label}</span>
     </div>
   )

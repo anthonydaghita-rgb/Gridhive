@@ -1,5 +1,6 @@
 import { BaseEdge, EdgeLabelRenderer, getBezierPath, type Edge, type EdgeProps } from '@xyflow/react'
-import type { ConnectionData } from '@gridhive/shared'
+import type { ConnectionData, NetworkProtocol } from '@gridhive/shared'
+import { PROTOCOL_LABELS } from '@gridhive/shared'
 
 const STATUS_COLORS = {
   'active': '#4b5563',
@@ -17,6 +18,38 @@ const MEDIA_COLORS = {
   'sfp': '#f59e0b',
 } as const
 
+function getProtocolStyle(protocols: NetworkProtocol[]): { dash?: string; color?: string } {
+  if (protocols.length === 0) return {}
+
+  const primary = protocols[0]
+  // WAN/Tunneling: dashed
+  const wanProtocols = ['mpls', 'sd-wan', 'site-to-site-vpn', 'gre-tunnel']
+  // VPN: dotted
+  const vpnProtocols = ['ssl-vpn', 'wireguard']
+  // Industrial: solid orange
+  const industrialProtocols = ['profinet', 'ethernet-ip', 'modbus-tcp', 'bacnet', 'dnp3']
+
+  if (vpnProtocols.includes(primary)) return { dash: '3,4', color: '#06b6d4' }
+  if (wanProtocols.includes(primary)) return { dash: '8,4', color: '#8b5cf6' }
+  if (industrialProtocols.includes(primary)) return { color: '#f97316' }
+
+  return {}
+}
+
+function getEdgeLabel(data: ConnectionData): string | null {
+  if (data.label) return data.label
+
+  const protocols = data.protocols || []
+  if (protocols.length === 0) return null
+
+  const primary = protocols[0]
+  const label = data.customProtocol && primary === 'custom'
+    ? data.customProtocol
+    : (PROTOCOL_LABELS[primary] || primary)
+
+  return protocols.length > 1 ? `${label} +${protocols.length - 1}` : label
+}
+
 export function NetworkEdge({
   id, sourceX, sourceY, targetX, targetY,
   sourcePosition, targetPosition,
@@ -30,16 +63,23 @@ export function NetworkEdge({
   const edgeData = data as ConnectionData | undefined
   const status = edgeData?.status || 'active'
   const mediaType = edgeData?.mediaType || 'copper'
+  const protocols = edgeData?.protocols || []
+
+  const protocolStyle = getProtocolStyle(protocols)
 
   const strokeColor = selected
     ? '#3b82f6'
     : status === 'simulated-down'
     ? STATUS_COLORS['simulated-down']
-    : MEDIA_COLORS[mediaType] || '#4b5563'
+    : protocolStyle.color || MEDIA_COLORS[mediaType] || '#4b5563'
 
-  const strokeDash = status === 'planned' ? '5,5' : status === 'simulated-down' ? '8,4' : undefined
+  let strokeDash = protocolStyle.dash
+  if (!strokeDash) {
+    if (status === 'planned') strokeDash = '5,5'
+    else if (status === 'simulated-down') strokeDash = '8,4'
+  }
 
-  const label = edgeData?.label || edgeData?.protocol
+  const label = getEdgeLabel(edgeData || {})
 
   return (
     <>

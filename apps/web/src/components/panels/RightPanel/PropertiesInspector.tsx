@@ -1,3 +1,4 @@
+import { MousePointer2 } from 'lucide-react'
 import { useCanvasStore } from '../../../stores/canvasStore'
 import { DeviceForm } from './DeviceForm'
 import { ConnectionForm } from './ConnectionForm'
@@ -10,8 +11,8 @@ export function PropertiesInspector() {
 
   if (!selectedNode && !selectedEdge) {
     return (
-      <div className="p-4 text-center text-gray-500 text-sm mt-8">
-        <p className="text-2xl mb-2">👆</p>
+      <div className="p-4 text-center text-gray-500 text-sm mt-8 flex flex-col items-center gap-2">
+        <MousePointer2 className="w-6 h-6 text-gray-600" />
         <p>Select a device or connection to view and edit its properties.</p>
       </div>
     )
