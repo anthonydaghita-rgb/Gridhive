@@ -29,7 +29,7 @@ export function AppShell() {
   }, [currentProject?.orgId, setOrgLogo])
 
   return (
-    <div className="h-screen flex flex-col bg-gray-950 text-white overflow-hidden">
+    <div className="h-screen flex flex-col text-white overflow-hidden" style={{ background: '#0d0f12' }}>
       <TopToolbar />
 
       <div className="flex flex-1 overflow-hidden">
@@ -55,8 +55,8 @@ export function AppShell() {
                 <BottomPanelTab tab="compliance" label="Compliance" />
               </div>
               <div className="flex-1 overflow-hidden">
-                {bottomPanelTab === 'validation' && <ValidationPanel />}
-                {bottomPanelTab === 'simulation' && <SimulationPanel />}
+                {bottomPanelTab === 'validation' && <div className="h-full overflow-y-auto"><ValidationPanel /></div>}
+                {bottomPanelTab === 'simulation' && <div className="h-full overflow-y-auto"><SimulationPanel /></div>}
                 {bottomPanelTab === 'compliance' && <CompliancePanel />}
               </div>
             </div>

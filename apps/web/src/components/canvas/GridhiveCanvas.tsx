@@ -71,7 +71,7 @@ function Canvas() {
   const {
     nodes, edges, viewport,
     setNodes, setEdges, setViewport,
-    setSelectedNode, setSelectedEdge,
+    setSelectedNode, setSelectedEdge, setSelectedNodeIds,
     addEdge: storeAddEdge, addNode,
     fitViewNodeIds, clearFitView,
   } = useCanvasStore()
@@ -186,7 +186,12 @@ function Canvas() {
         onConnect={onConnect}
         onNodeClick={(_: React.MouseEvent, node: Node) => setSelectedNode(node.id)}
         onEdgeClick={(_: React.MouseEvent, edge: Edge) => setSelectedEdge(edge.id)}
-        onPaneClick={() => { setSelectedNode(null); setSelectedEdge(null) }}
+        onPaneClick={() => { setSelectedNode(null); setSelectedEdge(null); setSelectedNodeIds([]) }}
+        onSelectionChange={({ nodes: selectedNodes }) => {
+          if (selectedNodes.length > 1) setSelectedNodeIds(selectedNodes.map(n => n.id))
+        }}
+        selectionOnDrag
+        multiSelectionKeyCode="Shift"
         onMoveEnd={(_: MouseEvent | TouchEvent | null, vp: Viewport) => setViewport(vp)}
         onDrop={onDrop}
         onDragOver={onDragOver}

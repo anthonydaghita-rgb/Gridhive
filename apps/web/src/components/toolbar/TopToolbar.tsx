@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Loader2, PanelLeft, PanelRight, PanelBottom, Download, LayoutTemplate, ShieldCheck, History, Settings, Save } from 'lucide-react'
+import { GridhiveLogo } from '../GridhiveLogo'
 import { useProjectStore } from '../../stores/projectStore'
 import { useUiStore } from '../../stores/uiStore'
 import { useValidationStore } from '../../stores/validationStore'
@@ -37,12 +38,12 @@ export function TopToolbar() {
   }
 
   return (
-    <header className="h-12 border-b border-gray-800 bg-gray-900 flex items-center px-3 gap-2 flex-shrink-0">
+    <header className="h-12 border-b border-gray-800 flex items-center px-3 gap-2 flex-shrink-0" style={{ background: '#0d0f12' }}>
       {/* Logo / back to dashboard */}
       <button onClick={() => navigate('/')} className="flex items-center mr-2 hover:opacity-80 transition-opacity">
         {orgLogoBase64
           ? <img src={orgLogoBase64} alt="Org logo" className="h-6 max-w-[120px] object-contain" />
-          : <span className="text-blue-400 font-bold text-sm">Gridhive</span>
+          : <GridhiveLogo size="sm" />
         }
       </button>
 

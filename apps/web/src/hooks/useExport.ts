@@ -76,6 +76,7 @@ export function useExport() {
     setIsGeneratingPDF(true)
     try {
       const topology = getTopologySnapshot()
+      const canvasImageBase64 = await useCanvasStore.getState().captureCanvasThumbnail()
       const { generatePDF } = await import('../components/export/PDFGenerator')
 
       await generatePDF({
@@ -88,6 +89,7 @@ export function useExport() {
         simulationTests: [],
         lastValidatedAt,
         lastSimulatedAt,
+        canvasImageBase64: canvasImageBase64 ?? undefined,
       }, options)
     } catch (err) {
       console.error('PDF generation failed:', err)

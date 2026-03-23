@@ -9,6 +9,7 @@ import {
 import { useAuthStore } from '../stores/authStore'
 import { api } from '../lib/api'
 import type { Project, Organization } from '@gridhive/shared'
+import { GridhiveLogo } from '../components/GridhiveLogo'
 
 interface FolderData {
   id: string
@@ -269,7 +270,7 @@ export function DashboardPage() {
       <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 w-full max-w-md space-y-6">
           <div>
-            <h1 className="text-2xl font-bold">Welcome to Gridhive</h1>
+            <GridhiveLogo size="md" className="mb-3" />
             <p className="text-gray-400 mt-1">Create a workspace to get started.</p>
           </div>
           <div className="space-y-3">
@@ -308,9 +309,9 @@ export function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col" onClick={() => setContextMenu(null)}>
       {/* Header */}
-      <header className="border-b border-gray-800 px-6 py-3 flex items-center justify-between flex-shrink-0">
+      <header className="border-b border-gray-800 px-6 py-3 flex items-center justify-between flex-shrink-0" style={{ background: '#0d0f12' }}>
         <div className="flex items-center gap-3">
-          <span className="text-xl font-bold text-blue-400">Gridhive</span>
+          <GridhiveLogo size="sm" />
           {selectedOrgId && orgs.length > 0 && (
             <div className="relative">
               <button

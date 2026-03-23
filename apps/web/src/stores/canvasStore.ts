@@ -12,6 +12,7 @@ interface CanvasStore {
   viewport: Viewport
   selectedNodeId: string | null
   selectedEdgeId: string | null
+  selectedNodeIds: string[]
   fitViewNodeIds: string[] | null
 
   setNodes: (nodes: DeviceNode[] | ((prev: DeviceNode[]) => DeviceNode[])) => void
@@ -19,11 +20,13 @@ interface CanvasStore {
   setViewport: (viewport: Viewport) => void
   setSelectedNode: (id: string | null) => void
   setSelectedEdge: (id: string | null) => void
+  setSelectedNodeIds: (ids: string[]) => void
   setFitViewNodes: (ids: string[]) => void
   clearFitView: () => void
 
   addNode: (node: DeviceNode) => void
   updateNodeData: (id: string, data: Partial<DeviceData>) => void
+  bulkUpdateNodeData: (ids: string[], data: Partial<DeviceData>) => void
   deleteNode: (id: string) => void
 
   addEdge: (edge: ConnectionEdge) => void
@@ -43,6 +46,7 @@ export const useCanvasStore = create<CanvasStore>()(
     viewport: { x: 0, y: 0, zoom: 1 },
     selectedNodeId: null,
     selectedEdgeId: null,
+    selectedNodeIds: [],
     fitViewNodeIds: null,
 
     setNodes: (nodes) => set(state => ({
@@ -55,8 +59,9 @@ export const useCanvasStore = create<CanvasStore>()(
 
     setViewport: (viewport) => set({ viewport }),
 
-    setSelectedNode: (id) => set({ selectedNodeId: id, selectedEdgeId: null }),
-    setSelectedEdge: (id) => set({ selectedEdgeId: id, selectedNodeId: null }),
+    setSelectedNode: (id) => set({ selectedNodeId: id, selectedEdgeId: null, selectedNodeIds: id ? [id] : [] }),
+    setSelectedEdge: (id) => set({ selectedEdgeId: id, selectedNodeId: null, selectedNodeIds: [] }),
+    setSelectedNodeIds: (ids) => set({ selectedNodeIds: ids, selectedNodeId: ids.length === 1 ? ids[0] : null, selectedEdgeId: null }),
     setFitViewNodes: (ids) => set({ fitViewNodeIds: ids }),
     clearFitView: () => set({ fitViewNodeIds: null }),
 
@@ -66,10 +71,15 @@ export const useCanvasStore = create<CanvasStore>()(
       nodes: state.nodes.map(n => n.id === id ? { ...n, data: { ...n.data, ...data } } : n),
     })),
 
+    bulkUpdateNodeData: (ids, data) => set(state => ({
+      nodes: state.nodes.map(n => ids.includes(n.id) ? { ...n, data: { ...n.data, ...data } } : n),
+    })),
+
     deleteNode: (id) => set(state => ({
       nodes: state.nodes.filter(n => n.id !== id),
       edges: state.edges.filter(e => e.source !== id && e.target !== id),
       selectedNodeId: state.selectedNodeId === id ? null : state.selectedNodeId,
+      selectedNodeIds: state.selectedNodeIds.filter(i => i !== id),
     })),
 
     addEdge: (edge) => set(state => ({ edges: [...state.edges, edge] })),
@@ -99,7 +109,7 @@ export const useCanvasStore = create<CanvasStore>()(
       }
     },
 
-    clearCanvas: () => set({ nodes: [], edges: [], selectedNodeId: null, selectedEdgeId: null }),
+    clearCanvas: () => set({ nodes: [], edges: [], selectedNodeId: null, selectedEdgeId: null, selectedNodeIds: [] }),
 
     captureCanvasThumbnail: async () => {
       try {

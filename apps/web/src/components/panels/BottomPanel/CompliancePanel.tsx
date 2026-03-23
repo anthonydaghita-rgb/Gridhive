@@ -6,12 +6,12 @@ import type { ComplianceReport } from '@gridhive/shared'
 
 type SupportedFrameworkId = 'hipaa' | 'nist-csf' | 'cmmc-l2' | 'pci-dss' | 'soc2'
 
-const FRAMEWORKS: { id: SupportedFrameworkId; name: string; description: string }[] = [
-  { id: 'hipaa', name: 'HIPAA', description: 'Healthcare — PHI protection requirements' },
-  { id: 'nist-csf', name: 'NIST CSF', description: 'Critical infrastructure cybersecurity' },
-  { id: 'cmmc-l2', name: 'CMMC 2.0', description: 'DoD contractor CUI handling' },
-  { id: 'pci-dss', name: 'PCI DSS', description: 'Payment card data security' },
-  { id: 'soc2', name: 'SOC 2', description: 'SaaS/cloud trust services' },
+const FRAMEWORKS: { id: SupportedFrameworkId; name: string }[] = [
+  { id: 'hipaa', name: 'HIPAA' },
+  { id: 'nist-csf', name: 'NIST CSF' },
+  { id: 'cmmc-l2', name: 'CMMC 2.0' },
+  { id: 'pci-dss', name: 'PCI DSS' },
+  { id: 'soc2', name: 'SOC 2' },
 ]
 
 export function CompliancePanel() {
@@ -60,37 +60,35 @@ export function CompliancePanel() {
     : 'text-gray-400'
 
   return (
-    <div className="flex h-full">
-      {/* Sidebar: framework selector + run button */}
-      <div className="w-48 flex-shrink-0 border-r border-gray-800 p-3 flex flex-col gap-3">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Framework</p>
-        <div className="space-y-1">
+    <div className="flex flex-col h-full">
+      {/* Top toolbar: framework pills + run button */}
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-800 flex-shrink-0 flex-wrap">
+        <div className="flex gap-1 flex-wrap">
           {FRAMEWORKS.map(fw => (
             <button
               key={fw.id}
               onClick={() => { setSelectedFramework(fw.id); setReport(null); setError(null) }}
-              className={`w-full text-left px-2 py-2 rounded text-xs transition-colors ${
+              className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 selectedFramework === fw.id
-                  ? 'bg-blue-600/20 border border-blue-500/40 text-blue-300'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700'
               }`}
             >
-              <p className="font-medium">{fw.name}</p>
-              <p className="text-gray-500 text-[10px] leading-tight mt-0.5">{fw.description}</p>
+              {fw.name}
             </button>
           ))}
         </div>
         <button
           onClick={runCheck}
           disabled={loading}
-          className="mt-auto flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white py-2 rounded text-xs font-medium transition-colors"
+          className="ml-auto flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors flex-shrink-0"
         >
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ShieldCheck className="w-3.5 h-3.5" />}
           {loading ? 'Running...' : 'Run Check'}
         </button>
       </div>
 
-      {/* Results area */}
+      {/* Scrollable results area */}
       <div className="flex-1 overflow-y-auto p-3">
         {error && (
           <div className="flex items-center gap-2 text-sm text-red-400 bg-red-900/20 border border-red-800/30 rounded px-3 py-2">
@@ -102,7 +100,7 @@ export function CompliancePanel() {
         {!report && !error && !loading && (
           <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
             <ShieldCheck className="w-8 h-8 mb-2 text-gray-700" />
-            <p className="text-sm">Select a framework and run a compliance check</p>
+            <p className="text-sm">Select a framework and click Run Check</p>
           </div>
         )}
 
@@ -136,14 +134,13 @@ export function CompliancePanel() {
                   <span className="text-xs text-green-400">{report.passed.length} passed</span>
                 </div>
               </div>
-              <div className="text-right">
+              <div>
                 {report.overallStatus === 'pass' && <ShieldCheck className="w-6 h-6 text-green-400" />}
                 {report.overallStatus === 'warnings' && <ShieldAlert className="w-6 h-6 text-yellow-400" />}
                 {report.overallStatus === 'fail' && <ShieldAlert className="w-6 h-6 text-red-400" />}
               </div>
             </div>
 
-            {/* Violations */}
             {report.violations.length > 0 && (
               <CollapsibleSection
                 label={`Violations (${report.violations.length})`}
@@ -157,7 +154,6 @@ export function CompliancePanel() {
               </CollapsibleSection>
             )}
 
-            {/* Warnings */}
             {report.warnings.length > 0 && (
               <CollapsibleSection
                 label={`Warnings (${report.warnings.length})`}
@@ -171,7 +167,6 @@ export function CompliancePanel() {
               </CollapsibleSection>
             )}
 
-            {/* Passed */}
             {report.passed.length > 0 && (
               <CollapsibleSection
                 label={`Passed (${report.passed.length})`}
