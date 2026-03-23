@@ -4,6 +4,7 @@ import { ComponentLibrary } from '../panels/LeftPanel/ComponentLibrary'
 import { PropertiesInspector } from '../panels/RightPanel/PropertiesInspector'
 import { ValidationPanel } from '../panels/BottomPanel/ValidationPanel'
 import { SimulationPanel } from '../panels/BottomPanel/SimulationPanel'
+import { CompliancePanel } from '../panels/BottomPanel/CompliancePanel'
 import { GridhiveCanvas } from '../canvas/GridhiveCanvas'
 import { NewProjectModal } from '../modals/NewProjectModal'
 import { TemplateLibraryModal } from '../modals/TemplateLibraryModal'
@@ -51,9 +52,12 @@ export function AppShell() {
               <div className="flex border-b border-gray-800">
                 <BottomPanelTab tab="validation" label="Validation" />
                 <BottomPanelTab tab="simulation" label="Simulation" />
+                <BottomPanelTab tab="compliance" label="Compliance" />
               </div>
-              <div className="flex-1 overflow-y-auto">
-                {bottomPanelTab === 'validation' ? <ValidationPanel /> : <SimulationPanel />}
+              <div className="flex-1 overflow-hidden">
+                {bottomPanelTab === 'validation' && <ValidationPanel />}
+                {bottomPanelTab === 'simulation' && <SimulationPanel />}
+                {bottomPanelTab === 'compliance' && <CompliancePanel />}
               </div>
             </div>
           )}
@@ -78,7 +82,7 @@ export function AppShell() {
   )
 }
 
-function BottomPanelTab({ tab, label }: { tab: 'validation' | 'simulation'; label: string }) {
+function BottomPanelTab({ tab, label }: { tab: 'validation' | 'simulation' | 'compliance'; label: string }) {
   const { bottomPanelTab, setBottomPanelTab } = useUiStore()
   return (
     <button

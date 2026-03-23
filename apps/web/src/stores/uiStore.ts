@@ -14,14 +14,14 @@ interface UiStore {
   leftPanelOpen: boolean
   rightPanelOpen: boolean
   bottomPanelOpen: boolean
-  bottomPanelTab: 'validation' | 'simulation'
+  bottomPanelTab: 'validation' | 'simulation' | 'compliance'
   activeModal: ActiveModal
   orgLogoBase64: string | null
 
   setLeftPanel: (open: boolean) => void
   setRightPanel: (open: boolean) => void
   setBottomPanel: (open: boolean) => void
-  setBottomPanelTab: (tab: 'validation' | 'simulation') => void
+  setBottomPanelTab: (tab: 'validation' | 'simulation' | 'compliance') => void
   setActiveModal: (modal: ActiveModal) => void
   closeModal: () => void
   setOrgLogo: (logo: string | null) => void

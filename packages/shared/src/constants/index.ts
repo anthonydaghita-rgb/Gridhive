@@ -3,6 +3,7 @@ export const DEVICE_CATEGORIES = {
   'End Devices': ['workstation', 'server', 'printer', 'voip-phone', 'nas'],
   'Security & Monitoring': ['camera', 'firewall-edge'],
   'Industrial': ['plc', 'sensor', 'hmi'],
+  'Access Control': ['ac-server', 'ac-controller', 'ac-reader', 'ac-door-hardware', 'ac-intercom', 'ac-biometric', 'ac-key-pad', 'ac-visitor-kiosk', 'ac-elevator-ctrl', 'ac-turnstile'],
   'Other': ['internet'],
 } as const
 
@@ -98,4 +99,14 @@ export const DEVICE_DISPLAY_NAMES: Record<string, string> = {
   'patch-panel': 'Patch Panel',
   'hmi': 'HMI',
   'firewall-edge': 'Edge Firewall',
+  'ac-server': 'AC Server',
+  'ac-controller': 'AC Controller',
+  'ac-reader': 'Card Reader',
+  'ac-door-hardware': 'Door Hardware',
+  'ac-intercom': 'Intercom',
+  'ac-biometric': 'Biometric Reader',
+  'ac-key-pad': 'Keypad',
+  'ac-visitor-kiosk': 'Visitor Kiosk',
+  'ac-elevator-ctrl': 'Elevator Ctrl',
+  'ac-turnstile': 'Turnstile',
 }

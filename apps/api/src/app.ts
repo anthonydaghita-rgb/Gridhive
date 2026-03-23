@@ -45,6 +45,8 @@ export async function buildApp() {
   await app.register(import('./modules/validation/index.js'), { prefix: '/validate' })
   await app.register(import('./modules/simulation/index.js'), { prefix: '/simulate' })
   await app.register(import('./modules/admin/index.js'), { prefix: '/admin' })
+  await app.register(import('./modules/compliance/index.js'), { prefix: '/compliance' })
+  await app.register(import('./modules/configexport/index.js'), { prefix: '/export' })
 
   // Register config watcher before listen (Fastify v5 requires decorate before start)
   await app.register(async (instance) => {
