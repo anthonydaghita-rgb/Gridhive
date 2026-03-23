@@ -221,3 +221,126 @@ export function HMIIcon({ className, size = 24 }: IconProps) {
     </svg>
   )
 }
+
+export function ACServerIcon({ className, size = 24 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="2" y="3" width="20" height="5" rx="1" />
+      <rect x="2" y="10" width="20" height="5" rx="1" />
+      <circle cx="18" cy="5.5" r="1" fill="currentColor" stroke="none" />
+      <circle cx="18" cy="12.5" r="1" fill="currentColor" stroke="none" />
+      <line x1="5" y1="5.5" x2="14" y2="5.5" />
+      <line x1="5" y1="12.5" x2="14" y2="12.5" />
+      <path d="M9 18l3 3 3-3" />
+      <line x1="12" y1="15" x2="12" y2="21" />
+    </svg>
+  )
+}
+
+export function ACControllerIcon({ className, size = 24 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <circle cx="8" cy="12" r="2" />
+      <line x1="13" y1="9" x2="19" y2="9" />
+      <line x1="13" y1="12" x2="19" y2="12" />
+      <line x1="13" y1="15" x2="17" y2="15" />
+    </svg>
+  )
+}
+
+export function ACReaderIcon({ className, size = 24 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="7" y="2" width="10" height="20" rx="2" />
+      <line x1="10" y1="6" x2="14" y2="6" />
+      <line x1="10" y1="9" x2="14" y2="9" />
+      <circle cx="12" cy="16" r="2" />
+    </svg>
+  )
+}
+
+export function ACDoorHardwareIcon({ className, size = 24 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="4" y="2" width="16" height="20" rx="1" />
+      <circle cx="15" cy="12" r="1.5" />
+      <line x1="2" y1="22" x2="22" y2="22" />
+    </svg>
+  )
+}
+
+export function ACIntercomIcon({ className, size = 24 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="5" y="2" width="14" height="20" rx="2" />
+      <circle cx="12" cy="8" r="3" />
+      <rect x="8" y="13" width="8" height="5" rx="1" />
+      <line x1="10" y1="15" x2="14" y2="15" />
+    </svg>
+  )
+}
+
+export function ACBiometricIcon({ className, size = 24 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M12 2a5 5 0 0 1 5 5v3a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z" />
+      <path d="M9 9c0 1.66 1.34 3 3 3s3-1.34 3-3" />
+      <path d="M6 21v-1a6 6 0 0 1 12 0v1" />
+    </svg>
+  )
+}
+
+export function ACKeyPadIcon({ className, size = 24 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="6" y="2" width="12" height="20" rx="2" />
+      <circle cx="9" cy="7" r="1" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="7" r="1" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="7" r="1" fill="currentColor" stroke="none" />
+      <circle cx="9" cy="11" r="1" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="11" r="1" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="11" r="1" fill="currentColor" stroke="none" />
+      <circle cx="9" cy="15" r="1" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="15" r="1" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="15" r="1" fill="currentColor" stroke="none" />
+      <rect x="9" y="18" width="6" height="2" rx="1" />
+    </svg>
+  )
+}
+
+export function ACVisitorKioskIcon({ className, size = 24 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="4" y="2" width="16" height="20" rx="2" />
+      <rect x="7" y="5" width="10" height="8" rx="1" />
+      <line x1="8" y1="16" x2="16" y2="16" />
+      <line x1="8" y1="19" x2="13" y2="19" />
+    </svg>
+  )
+}
+
+export function ACElevatorCtrlIcon({ className, size = 24 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="3" y="2" width="18" height="20" rx="1" />
+      <line x1="12" y1="2" x2="12" y2="22" />
+      <polyline points="6 8 9 5 9 11" />
+      <polyline points="18 16 15 19 15 13" />
+    </svg>
+  )
+}
+
+export function ACTurnstileIcon({ className, size = 24 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="12" cy="12" r="3" />
+      <line x1="12" y1="2" x2="12" y2="9" />
+      <line x1="12" y1="15" x2="12" y2="22" />
+      <line x1="2" y1="12" x2="9" y2="12" />
+      <line x1="15" y1="12" x2="22" y2="12" />
+      <line x1="4" y1="4" x2="9" y2="9" />
+      <line x1="15" y1="15" x2="20" y2="20" />
+    </svg>
+  )
+}

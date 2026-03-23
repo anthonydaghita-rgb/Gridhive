@@ -18,6 +18,16 @@ import {
   SensorIcon,
   PatchPanelIcon,
   HMIIcon,
+  ACServerIcon,
+  ACControllerIcon,
+  ACReaderIcon,
+  ACDoorHardwareIcon,
+  ACIntercomIcon,
+  ACBiometricIcon,
+  ACKeyPadIcon,
+  ACVisitorKioskIcon,
+  ACElevatorCtrlIcon,
+  ACTurnstileIcon,
 } from './DeviceIcons'
 import { createElement } from 'react'
 
@@ -39,6 +49,16 @@ const DEVICE_ICON_MAP: Record<DeviceType, (props: { className?: string; size?: n
   'sensor': SensorIcon,
   'patch-panel': PatchPanelIcon,
   'hmi': HMIIcon,
+  'ac-server': ACServerIcon,
+  'ac-controller': ACControllerIcon,
+  'ac-reader': ACReaderIcon,
+  'ac-door-hardware': ACDoorHardwareIcon,
+  'ac-intercom': ACIntercomIcon,
+  'ac-biometric': ACBiometricIcon,
+  'ac-key-pad': ACKeyPadIcon,
+  'ac-visitor-kiosk': ACVisitorKioskIcon,
+  'ac-elevator-ctrl': ACElevatorCtrlIcon,
+  'ac-turnstile': ACTurnstileIcon,
 }
 
 export function getDeviceIcon(deviceType: DeviceType, props?: { className?: string; size?: number }): ReactNode {

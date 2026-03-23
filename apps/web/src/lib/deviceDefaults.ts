@@ -42,6 +42,26 @@ export function getDeviceDefaults(deviceType: DeviceType): Partial<DeviceData> {
       return { ...base, manufacturer: 'Siemens', role: 'human-machine-interface' }
     case 'patch-panel':
       return { ...base, role: 'patch-panel' }
+    case 'ac-server':
+      return { ...base, manufacturer: 'Genetec', role: 'access-control-server' }
+    case 'ac-controller':
+      return { ...base, manufacturer: 'HID Global', role: 'door-controller' }
+    case 'ac-reader':
+      return { ...base, manufacturer: 'HID Global', role: 'card-reader' }
+    case 'ac-door-hardware':
+      return { ...base, role: 'door-hardware' }
+    case 'ac-intercom':
+      return { ...base, manufacturer: 'Axis', role: 'video-intercom' }
+    case 'ac-biometric':
+      return { ...base, role: 'biometric-reader' }
+    case 'ac-key-pad':
+      return { ...base, role: 'keypad-reader' }
+    case 'ac-visitor-kiosk':
+      return { ...base, role: 'visitor-management' }
+    case 'ac-elevator-ctrl':
+      return { ...base, role: 'elevator-controller' }
+    case 'ac-turnstile':
+      return { ...base, role: 'turnstile' }
     default:
       return base
   }
@@ -67,6 +87,16 @@ function getDefaultHostname(deviceType: DeviceType): string {
     'sensor': 'SENSOR',
     'hmi': 'HMI',
     'patch-panel': 'PP',
+    'ac-server': 'ACS',
+    'ac-controller': 'ACC',
+    'ac-reader': 'ACR',
+    'ac-door-hardware': 'DOOR',
+    'ac-intercom': 'ICOM',
+    'ac-biometric': 'BIO',
+    'ac-key-pad': 'KP',
+    'ac-visitor-kiosk': 'KIOSK',
+    'ac-elevator-ctrl': 'ELEV',
+    'ac-turnstile': 'TURN',
   }
   return `${prefixes[deviceType] || 'DEV'}-${timestamp}`
 }
@@ -90,6 +120,16 @@ function getDefaultLabel(deviceType: DeviceType): string {
     'sensor': 'Sensor',
     'hmi': 'HMI',
     'patch-panel': 'Patch Panel',
+    'ac-server': 'AC Server',
+    'ac-controller': 'AC Controller',
+    'ac-reader': 'Card Reader',
+    'ac-door-hardware': 'Door Hardware',
+    'ac-intercom': 'Intercom',
+    'ac-biometric': 'Biometric Reader',
+    'ac-key-pad': 'Keypad',
+    'ac-visitor-kiosk': 'Visitor Kiosk',
+    'ac-elevator-ctrl': 'Elevator Controller',
+    'ac-turnstile': 'Turnstile',
   }
   return labels[deviceType] || 'Device'
 }
