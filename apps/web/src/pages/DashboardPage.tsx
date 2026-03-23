@@ -695,8 +695,8 @@ function ProjectCard({
 
   return (
     <div
-      className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden cursor-pointer hover:border-blue-500/50 transition-colors group"
-      onClick={onOpen}
+      className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden cursor-pointer hover:border-blue-500/50 transition-colors"
+      onClick={() => { if (showMenu) setShowMenu(false); else onOpen() }}
     >
       {/* Thumbnail */}
       <div className="h-28 bg-gray-800 relative overflow-hidden">
@@ -710,9 +710,9 @@ function ProjectCard({
           </div>
         )}
 
-        {/* Context menu button */}
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <div className="relative" onClick={e => e.stopPropagation()}>
+        {/* Context menu button — always visible */}
+        <div className="absolute top-2 right-2" onClick={e => e.stopPropagation()}>
+          <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
               className="w-7 h-7 bg-gray-900/90 hover:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:text-white transition-colors"

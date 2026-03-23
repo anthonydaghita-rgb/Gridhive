@@ -70,7 +70,7 @@ export function BulkEditForm({ nodeIds }: BulkEditFormProps) {
           type="text"
           placeholder="e.g. 255.255.255.0"
           className="form-input"
-          onChange={e => setField('subnetMask', e.target.value || undefined)}
+          onChange={e => setField('subnet', e.target.value || undefined)}
         />
       </Field>
 

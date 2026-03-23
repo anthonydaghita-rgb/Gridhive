@@ -165,9 +165,9 @@ export function ExportModal() {
 }
 
 function DeviceConfigTab() {
-  const { nodes, edges } = useCanvasStore()
+  const { nodes, getTopologySnapshot } = useCanvasStore()
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>('')
-  const [profiles, setProfiles] = useState<VendorDeviceProfile[] | null>(null)
+  const [allProfiles, setAllProfiles] = useState<VendorDeviceProfile[] | null>(null)
   const [selectedProfileId, setSelectedProfileId] = useState<string>('')
   const [result, setResult] = useState<ConfigExportResult | null>(null)
   const [loading, setLoading] = useState(false)
@@ -180,12 +180,17 @@ function DeviceConfigTab() {
       'ac-elevator-ctrl', 'ac-turnstile'].includes(n.data.deviceType || '')
   )
 
+  const selectedDevice = nodes.find(n => n.id === selectedDeviceId)
+  const profiles = allProfiles
+    ? allProfiles.filter(p => !selectedDevice || p.deviceType === selectedDevice.data.deviceType)
+    : null
+
   async function loadProfiles() {
     setLoadingProfiles(true)
     setError(null)
     try {
       const data = await api.get<VendorDeviceProfile[]>('/export/profiles')
-      setProfiles(data)
+      setAllProfiles(data)
     } catch {
       setError('Failed to load device profiles')
     } finally {
@@ -200,7 +205,7 @@ function DeviceConfigTab() {
     setResult(null)
     try {
       const data = await api.post<ConfigExportResult>('/export/device-config', {
-        topology: { nodes, edges },
+        topology: getTopologySnapshot(),
         deviceId: selectedDeviceId,
         profileId: selectedProfileId,
       })
@@ -223,7 +228,7 @@ function DeviceConfigTab() {
     URL.revokeObjectURL(url)
   }
 
-  const selectedProfile = profiles?.find(p => p.id === selectedProfileId)
+  const selectedProfile = allProfiles?.find(p => p.id === selectedProfileId)
 
   return (
     <div className="p-4 space-y-4">
@@ -272,7 +277,12 @@ function DeviceConfigTab() {
                   </button>
                 )}
               </div>
-              {profiles && (
+              {profiles && profiles.length === 0 && (
+                <p className="text-xs text-yellow-400 bg-yellow-900/20 border border-yellow-800/30 rounded px-3 py-2">
+                  No vendor profiles available for this device type.
+                </p>
+              )}
+              {profiles && profiles.length > 0 && (
                 <select
                   value={selectedProfileId}
                   onChange={e => { setSelectedProfileId(e.target.value); setResult(null) }}

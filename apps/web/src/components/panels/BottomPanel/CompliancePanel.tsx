@@ -15,7 +15,7 @@ const FRAMEWORKS: { id: SupportedFrameworkId; name: string }[] = [
 ]
 
 export function CompliancePanel() {
-  const { nodes, edges } = useCanvasStore()
+  const { nodes, getTopologySnapshot } = useCanvasStore()
   const [selectedFramework, setSelectedFramework] = useState<SupportedFrameworkId>('nist-csf')
   const [report, setReport] = useState<ComplianceReport | null>(null)
   const [loading, setLoading] = useState(false)
@@ -25,8 +25,6 @@ export function CompliancePanel() {
     warnings: false,
     passed: false,
   })
-
-  const topology = { nodes, edges }
 
   async function runCheck() {
     if (nodes.length === 0) {
@@ -38,7 +36,7 @@ export function CompliancePanel() {
     setReport(null)
     try {
       const result = await api.post<ComplianceReport>('/compliance/run', {
-        topology,
+        topology: getTopologySnapshot(),
         frameworkId: selectedFramework,
       })
       setReport(result)

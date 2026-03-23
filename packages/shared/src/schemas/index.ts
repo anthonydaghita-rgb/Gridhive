@@ -3,7 +3,10 @@ import { z } from 'zod'
 export const DeviceTypeSchema = z.enum([
   'firewall', 'switch-l2', 'switch-l3', 'router', 'server',
   'workstation', 'printer', 'wireless-ap', 'camera', 'voip-phone',
-  'nas', 'internet', 'plc', 'sensor', 'patch-panel', 'hmi', 'firewall-edge'
+  'nas', 'internet', 'plc', 'sensor', 'patch-panel', 'hmi', 'firewall-edge',
+  'ac-server', 'ac-controller', 'ac-reader', 'ac-door-hardware',
+  'ac-intercom', 'ac-biometric', 'ac-key-pad', 'ac-visitor-kiosk',
+  'ac-elevator-ctrl', 'ac-turnstile',
 ])
 
 export const PortMappingSchema = z.object({
@@ -17,9 +20,9 @@ export const PortMappingSchema = z.object({
 })
 
 export const DeviceDataSchema = z.object({
-  hostname: z.string().min(1),
+  hostname: z.string(),
   deviceType: DeviceTypeSchema,
-  label: z.string().min(1),
+  label: z.string(),
   ipAddress: z.string().optional(),
   subnet: z.string().optional(),
   defaultGateway: z.string().optional(),
@@ -56,7 +59,7 @@ export const ConnectionDataSchema = z.object({
 
 export const DeviceNodeSchema = z.object({
   id: z.string(),
-  type: DeviceTypeSchema,
+  type: z.string(),
   position: z.object({ x: z.number(), y: z.number() }),
   data: DeviceDataSchema,
 })
@@ -65,7 +68,7 @@ export const ConnectionEdgeSchema = z.object({
   id: z.string(),
   source: z.string(),
   target: z.string(),
-  data: ConnectionDataSchema,
+  data: ConnectionDataSchema.optional(),
 })
 
 export const TopologySnapshotSchema = z.object({
