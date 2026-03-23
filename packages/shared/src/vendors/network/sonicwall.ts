@@ -1,0 +1,327 @@
+import type { VendorDeviceProfile } from '../../types/vendors.js'
+
+export const sonicwallDevices: VendorDeviceProfile[] = [
+  {
+    id: 'sonicwall-tz370',
+    vendor: 'sonicwall',
+    productLine: 'SonicWall TZ',
+    model: 'TZ370',
+    displayName: 'SonicWall TZ370',
+    deviceType: 'firewall',
+    icon: 'sonicwall',
+    releaseYear: 2021,
+    ndaaCompliant: true,
+    configFormat: 'sonicwall-exp',
+    firmwareVersions: ['7.1.1', '7.0.1'],
+    specs: {
+      portCount: 8,
+      wanPorts: 1,
+      throughputGbps: 1,
+      vpnThroughputGbps: 0.3,
+      idsIpsCapable: true,
+      formFactor: 'desktop',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'WAN interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }, { value: 'pppoe', label: 'PPPoE' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / VLANs',
+          description: 'VLAN interface configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'VLAN Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Firewall Rules',
+          description: 'Access rule configuration',
+          fields: [
+            { key: 'rule_name', label: 'Rule Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }] },
+          ],
+        },
+      ],
+    },
+    notes: 'SMB firewall, ~25 users, 300 Mbps VPN throughput.',
+  },
+  {
+    id: 'sonicwall-tz470',
+    vendor: 'sonicwall',
+    productLine: 'SonicWall TZ',
+    model: 'TZ470',
+    displayName: 'SonicWall TZ470',
+    deviceType: 'firewall',
+    icon: 'sonicwall',
+    releaseYear: 2021,
+    ndaaCompliant: true,
+    configFormat: 'sonicwall-exp',
+    firmwareVersions: ['7.1.1', '7.0.1'],
+    specs: {
+      portCount: 8,
+      sfpPorts: 2,
+      wanPorts: 1,
+      throughputGbps: 3.5,
+      idsIpsCapable: true,
+      formFactor: 'desktop',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'WAN interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }, { value: 'pppoe', label: 'PPPoE' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / VLANs',
+          description: 'VLAN interface configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'VLAN Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Firewall Rules',
+          description: 'Access rule configuration',
+          fields: [
+            { key: 'rule_name', label: 'Rule Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }] },
+          ],
+        },
+      ],
+    },
+    notes: '~50 users, 3.5 Gbps FW throughput.',
+  },
+  {
+    id: 'sonicwall-tz570p',
+    vendor: 'sonicwall',
+    productLine: 'SonicWall TZ',
+    model: 'TZ570P',
+    displayName: 'SonicWall TZ570P',
+    deviceType: 'firewall',
+    icon: 'sonicwall',
+    releaseYear: 2021,
+    ndaaCompliant: true,
+    configFormat: 'sonicwall-exp',
+    firmwareVersions: ['7.1.1', '7.0.1'],
+    specs: {
+      portCount: 8,
+      poePorts: 8,
+      sfpPlusPorts: 4,
+      wanPorts: 1,
+      throughputGbps: 4,
+      idsIpsCapable: true,
+      formFactor: 'desktop',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'WAN interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }, { value: 'pppoe', label: 'PPPoE' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / VLANs',
+          description: 'VLAN interface configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'VLAN Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Firewall Rules',
+          description: 'Access rule configuration',
+          fields: [
+            { key: 'rule_name', label: 'Rule Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }] },
+          ],
+        },
+      ],
+    },
+    notes: '8x GbE PoE LAN ports plus 4x SFP+ uplinks, 4 Gbps FW throughput.',
+  },
+  {
+    id: 'sonicwall-nsa-2700',
+    vendor: 'sonicwall',
+    productLine: 'SonicWall NSA',
+    model: 'NSA 2700',
+    displayName: 'SonicWall NSA 2700',
+    deviceType: 'firewall',
+    icon: 'sonicwall',
+    releaseYear: 2021,
+    ndaaCompliant: true,
+    configFormat: 'sonicwall-exp',
+    firmwareVersions: ['7.1.1', '7.0.1'],
+    specs: {
+      portCount: 16,
+      sfpPlusPorts: 4,
+      wanPorts: 2,
+      throughputGbps: 5.5,
+      idsIpsCapable: true,
+      rackUnits: 1,
+      formFactor: 'rack',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'WAN interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / VLANs',
+          description: 'VLAN interface configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'VLAN Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Firewall Rules',
+          description: 'Access rule configuration',
+          fields: [
+            { key: 'rule_name', label: 'Rule Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }] },
+          ],
+        },
+      ],
+    },
+    notes: '5.5 Gbps FW throughput, 1RU midrange appliance.',
+  },
+  {
+    id: 'sonicwall-nsa-4700',
+    vendor: 'sonicwall',
+    productLine: 'SonicWall NSA',
+    model: 'NSA 4700',
+    displayName: 'SonicWall NSA 4700',
+    deviceType: 'firewall',
+    icon: 'sonicwall',
+    releaseYear: 2021,
+    ndaaCompliant: true,
+    configFormat: 'sonicwall-exp',
+    firmwareVersions: ['7.1.1', '7.0.1'],
+    specs: {
+      portCount: 24,
+      sfpPlusPorts: 4,
+      wanPorts: 2,
+      throughputGbps: 18,
+      idsIpsCapable: true,
+      rackUnits: 1,
+      formFactor: 'rack',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'WAN interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / VLANs',
+          description: 'VLAN interface configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'VLAN Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Firewall Rules',
+          description: 'Access rule configuration',
+          fields: [
+            { key: 'rule_name', label: 'Rule Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }] },
+          ],
+        },
+      ],
+    },
+    notes: '18 Gbps FW throughput, 1RU high-performance appliance.',
+  },
+]

@@ -1,0 +1,327 @@
+import type { VendorDeviceProfile } from '../../types/vendors.js'
+
+export const watchguardDevices: VendorDeviceProfile[] = [
+  {
+    id: 'watchguard-firebox-t25-w',
+    vendor: 'watchguard',
+    productLine: 'Firebox T Series',
+    model: 'Firebox T25-W',
+    displayName: 'WatchGuard Firebox T25-W',
+    deviceType: 'firewall',
+    icon: 'watchguard',
+    releaseYear: 2021,
+    ndaaCompliant: true,
+    configFormat: 'watchguard-xml',
+    firmwareVersions: ['12.10.2', '12.9.3'],
+    specs: {
+      portCount: 5,
+      wanPorts: 1,
+      throughputGbps: 2.5,
+      idsIpsCapable: true,
+      wirelessStandard: 'Wi-Fi 5 (802.11ac)',
+      wirelessRadios: 2,
+      formFactor: 'desktop',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'External interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }, { value: 'pppoe', label: 'PPPoE' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / VLANs',
+          description: 'Interface and VLAN configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'VLAN Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Firewall Policies',
+          description: 'WatchGuard policy configuration',
+          fields: [
+            { key: 'rule_name', label: 'Policy Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }] },
+          ],
+        },
+      ],
+    },
+    notes: 'Small office appliance with built-in Wi-Fi 5, 2.5 Gbps FW throughput.',
+  },
+  {
+    id: 'watchguard-firebox-t85',
+    vendor: 'watchguard',
+    productLine: 'Firebox T Series',
+    model: 'Firebox T85',
+    displayName: 'WatchGuard Firebox T85',
+    deviceType: 'firewall',
+    icon: 'watchguard',
+    releaseYear: 2022,
+    ndaaCompliant: true,
+    configFormat: 'watchguard-xml',
+    firmwareVersions: ['12.10.2', '12.9.3'],
+    specs: {
+      portCount: 8,
+      wanPorts: 1,
+      throughputGbps: 3.8,
+      vpnThroughputGbps: 2,
+      idsIpsCapable: true,
+      formFactor: 'desktop',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'External interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }, { value: 'pppoe', label: 'PPPoE' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / VLANs',
+          description: 'Interface and VLAN configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'VLAN Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Firewall Policies',
+          description: 'WatchGuard policy configuration',
+          fields: [
+            { key: 'rule_name', label: 'Policy Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }] },
+          ],
+        },
+      ],
+    },
+    notes: '3.8 Gbps FW throughput, 2 Gbps VPN throughput.',
+  },
+  {
+    id: 'watchguard-firebox-m290',
+    vendor: 'watchguard',
+    productLine: 'Firebox M Series',
+    model: 'Firebox M290',
+    displayName: 'WatchGuard Firebox M290',
+    deviceType: 'firewall',
+    icon: 'watchguard',
+    releaseYear: 2021,
+    ndaaCompliant: true,
+    configFormat: 'watchguard-xml',
+    firmwareVersions: ['12.10.2', '12.9.3'],
+    specs: {
+      portCount: 8,
+      wanPorts: 2,
+      throughputGbps: 4.9,
+      idsIpsCapable: true,
+      rackUnits: 1,
+      formFactor: 'rack',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'External interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }, { value: 'pppoe', label: 'PPPoE' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / VLANs',
+          description: 'Interface and VLAN configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'VLAN Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Firewall Policies',
+          description: 'WatchGuard policy configuration',
+          fields: [
+            { key: 'rule_name', label: 'Policy Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }] },
+          ],
+        },
+      ],
+    },
+    notes: '4.9 Gbps FW throughput, 1RU midrange appliance.',
+  },
+  {
+    id: 'watchguard-firebox-m490',
+    vendor: 'watchguard',
+    productLine: 'Firebox M Series',
+    model: 'Firebox M490',
+    displayName: 'WatchGuard Firebox M490',
+    deviceType: 'firewall',
+    icon: 'watchguard',
+    releaseYear: 2021,
+    ndaaCompliant: true,
+    configFormat: 'watchguard-xml',
+    firmwareVersions: ['12.10.2', '12.9.3'],
+    specs: {
+      portCount: 10,
+      sfpPlusPorts: 4,
+      wanPorts: 2,
+      throughputGbps: 20,
+      idsIpsCapable: true,
+      rackUnits: 1,
+      formFactor: 'rack',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'External interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / VLANs',
+          description: 'Interface and VLAN configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'VLAN Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Firewall Policies',
+          description: 'WatchGuard policy configuration',
+          fields: [
+            { key: 'rule_name', label: 'Policy Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }] },
+          ],
+        },
+      ],
+    },
+    notes: '20 Gbps FW throughput, 10x GbE and 4x SFP+.',
+  },
+  {
+    id: 'watchguard-firebox-m590',
+    vendor: 'watchguard',
+    productLine: 'Firebox M Series',
+    model: 'Firebox M590',
+    displayName: 'WatchGuard Firebox M590',
+    deviceType: 'firewall',
+    icon: 'watchguard',
+    releaseYear: 2021,
+    ndaaCompliant: true,
+    configFormat: 'watchguard-xml',
+    firmwareVersions: ['12.10.2', '12.9.3'],
+    specs: {
+      portCount: 10,
+      sfpPlusPorts: 8,
+      wanPorts: 2,
+      throughputGbps: 24,
+      idsIpsCapable: true,
+      rackUnits: 1,
+      formFactor: 'rack',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'External interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / VLANs',
+          description: 'Interface and VLAN configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'VLAN Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Firewall Policies',
+          description: 'WatchGuard policy configuration',
+          fields: [
+            { key: 'rule_name', label: 'Policy Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }] },
+          ],
+        },
+      ],
+    },
+    notes: '24 Gbps FW throughput, 10x GbE and 8x SFP+.',
+  },
+]

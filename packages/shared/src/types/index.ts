@@ -16,6 +16,17 @@ export type DeviceType =
   | 'patch-panel'
   | 'hmi'
   | 'firewall-edge'
+  // Access Control device types (Phase 3)
+  | 'ac-server'
+  | 'ac-controller'
+  | 'ac-reader'
+  | 'ac-door-hardware'
+  | 'ac-intercom'
+  | 'ac-biometric'
+  | 'ac-key-pad'
+  | 'ac-visitor-kiosk'
+  | 'ac-elevator-ctrl'
+  | 'ac-turnstile'
 
 export interface PortMapping {
   portId: string
@@ -183,6 +194,9 @@ export type TemplateCategory =
   | 'campus-enterprise'
   | 'multi-site'
   | 'hybrid-cloud'
+  | 'physical-security'
+  | 'data-center'
+  | 'specialty'
   | 'custom'
 
 export interface TemplateMeta {

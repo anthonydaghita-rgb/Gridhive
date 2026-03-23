@@ -1,0 +1,325 @@
+import type { VendorDeviceProfile } from '../../types/vendors.js'
+
+export const paloAltoDevices: VendorDeviceProfile[] = [
+  {
+    id: 'palo-alto-pa-220',
+    vendor: 'palo-alto',
+    productLine: 'PA-200 Series',
+    model: 'PA-220',
+    displayName: 'Palo Alto PA-220',
+    deviceType: 'firewall',
+    icon: 'palo-alto',
+    releaseYear: 2019,
+    ndaaCompliant: true,
+    configFormat: 'panos-xml',
+    firmwareVersions: ['11.1.3', '11.0.4', '10.2.9'],
+    specs: {
+      portCount: 8,
+      wanPorts: 1,
+      throughputGbps: 0.5,
+      idsIpsCapable: true,
+      formFactor: 'desktop',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'Untrust zone interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }, { value: 'pppoe', label: 'PPPoE' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / Zones',
+          description: 'Security zone and subinterface configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'Zone Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Security Policies',
+          description: 'PAN-OS security policy rules',
+          fields: [
+            { key: 'rule_name', label: 'Rule Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }, { value: 'drop', label: 'Drop' }] },
+          ],
+        },
+      ],
+    },
+    notes: 'Branch NGFW, 500 Mbps FW throughput.',
+  },
+  {
+    id: 'palo-alto-pa-440',
+    vendor: 'palo-alto',
+    productLine: 'PA-400 Series',
+    model: 'PA-440',
+    displayName: 'Palo Alto PA-440',
+    deviceType: 'firewall',
+    icon: 'palo-alto',
+    releaseYear: 2021,
+    ndaaCompliant: true,
+    configFormat: 'panos-xml',
+    firmwareVersions: ['11.1.3', '11.0.4', '10.2.9'],
+    specs: {
+      portCount: 8,
+      sfpPlusPorts: 2,
+      wanPorts: 1,
+      throughputGbps: 3.8,
+      idsIpsCapable: true,
+      formFactor: 'desktop',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'Untrust zone interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }, { value: 'pppoe', label: 'PPPoE' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / Zones',
+          description: 'Security zone and subinterface configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'Zone Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Security Policies',
+          description: 'PAN-OS security policy rules',
+          fields: [
+            { key: 'rule_name', label: 'Rule Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }, { value: 'drop', label: 'Drop' }] },
+          ],
+        },
+      ],
+    },
+    notes: '3.8 Gbps FW throughput.',
+  },
+  {
+    id: 'palo-alto-pa-450',
+    vendor: 'palo-alto',
+    productLine: 'PA-400 Series',
+    model: 'PA-450',
+    displayName: 'Palo Alto PA-450',
+    deviceType: 'firewall',
+    icon: 'palo-alto',
+    releaseYear: 2021,
+    ndaaCompliant: true,
+    configFormat: 'panos-xml',
+    firmwareVersions: ['11.1.3', '11.0.4', '10.2.9'],
+    specs: {
+      portCount: 8,
+      sfpPlusPorts: 2,
+      wanPorts: 1,
+      throughputGbps: 5.5,
+      idsIpsCapable: true,
+      formFactor: 'desktop',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'Untrust zone interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }, { value: 'pppoe', label: 'PPPoE' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / Zones',
+          description: 'Security zone and subinterface configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'Zone Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Security Policies',
+          description: 'PAN-OS security policy rules',
+          fields: [
+            { key: 'rule_name', label: 'Rule Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }, { value: 'drop', label: 'Drop' }] },
+          ],
+        },
+      ],
+    },
+    notes: '5.5 Gbps FW throughput with SD-WAN capability.',
+  },
+  {
+    id: 'palo-alto-pa-1410',
+    vendor: 'palo-alto',
+    productLine: 'PA-1400 Series',
+    model: 'PA-1410',
+    displayName: 'Palo Alto PA-1410',
+    deviceType: 'firewall',
+    icon: 'palo-alto',
+    releaseYear: 2022,
+    ndaaCompliant: true,
+    configFormat: 'panos-xml',
+    firmwareVersions: ['11.1.3', '11.0.4', '10.2.9'],
+    specs: {
+      portCount: 12,
+      sfpPlusPorts: 4,
+      wanPorts: 2,
+      throughputGbps: 11,
+      idsIpsCapable: true,
+      rackUnits: 1,
+      formFactor: 'rack',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'Untrust zone interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / Zones',
+          description: 'Security zone and subinterface configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'Zone Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Security Policies',
+          description: 'PAN-OS security policy rules',
+          fields: [
+            { key: 'rule_name', label: 'Rule Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }, { value: 'drop', label: 'Drop' }] },
+          ],
+        },
+      ],
+    },
+    notes: '11 Gbps FW throughput.',
+  },
+  {
+    id: 'palo-alto-pa-3220',
+    vendor: 'palo-alto',
+    productLine: 'PA-3200 Series',
+    model: 'PA-3220',
+    displayName: 'Palo Alto PA-3220',
+    deviceType: 'firewall',
+    icon: 'palo-alto',
+    releaseYear: 2019,
+    ndaaCompliant: true,
+    configFormat: 'panos-xml',
+    firmwareVersions: ['11.1.3', '11.0.4', '10.2.9'],
+    specs: {
+      sfpPlusPorts: 12,
+      portCount: 16,
+      wanPorts: 2,
+      throughputGbps: 18,
+      idsIpsCapable: true,
+      rackUnits: 2,
+      formFactor: 'rack',
+      managementProtocol: ['https', 'ssh', 'snmp'],
+    },
+    configSchema: {
+      sections: [
+        {
+          id: 'system',
+          title: 'System',
+          description: 'System hostname and management settings',
+          fields: [
+            { key: 'hostname', label: 'Hostname', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'timezone', label: 'Timezone', type: 'text', defaultValue: 'UTC', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'wan',
+          title: 'WAN Configuration',
+          description: 'Untrust zone interface settings',
+          fields: [
+            { key: 'wan_type', label: 'WAN Type', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'dhcp', label: 'DHCP' }, { value: 'static', label: 'Static' }] },
+            { key: 'wan_ip', label: 'WAN IP Address', type: 'ip', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'vlans',
+          title: 'Interfaces / Zones',
+          description: 'Security zone and subinterface configuration',
+          fields: [
+            { key: 'vlan_id', label: 'VLAN ID', type: 'number', required: true, affectsConfigOutput: true },
+            { key: 'vlan_name', label: 'Zone Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'subnet', label: 'Subnet (CIDR)', type: 'cidr', required: false, affectsConfigOutput: true },
+          ],
+        },
+        {
+          id: 'firewall-rules',
+          title: 'Security Policies',
+          description: 'PAN-OS security policy rules',
+          fields: [
+            { key: 'rule_name', label: 'Rule Name', type: 'text', required: true, affectsConfigOutput: true },
+            { key: 'action', label: 'Action', type: 'select', required: true, affectsConfigOutput: true, options: [{ value: 'allow', label: 'Allow' }, { value: 'deny', label: 'Deny' }, { value: 'drop', label: 'Drop' }] },
+          ],
+        },
+      ],
+    },
+    notes: 'Campus NGFW, 18 Gbps FW throughput, 12x SFP+ and 16x GbE.',
+  },
+]
