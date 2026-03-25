@@ -651,6 +651,55 @@ const projectsModule: FastifyPluginAsync = async (fastify) => {
     await fastify.prisma.project.update({ where: { id: projectId }, data: { updatedAt: new Date() } })
     return reply.send({ data: newVersion })
   })
+
+  // ─── AUDIT LOG ENDPOINTS ─────────────────────────────────────────────────────
+
+  // GET /orgs/:orgId/audit-logs?page=1&limit=50&search=&action=
+  fastify.get('/orgs/:orgId/audit-logs', { preHandler: requireAuth }, async (request, reply) => {
+    const { orgId } = request.params as { orgId: string }
+    const { page = '1', limit = '50', search, action } = request.query as {
+      page?: string
+      limit?: string
+      search?: string
+      action?: string
+    }
+
+    // Verify membership
+    const member = await fastify.prisma.orgMember.findUnique({
+      where: { orgId_userId: { orgId, userId: request.user!.id } },
+    })
+    if (!member) return reply.status(403).send({ error: 'Forbidden' })
+
+    const pageNum = Math.max(1, parseInt(page, 10))
+    const limitNum = Math.min(200, Math.max(1, parseInt(limit, 10)))
+    const skip = (pageNum - 1) * limitNum
+
+    const where: Record<string, unknown> = { orgId }
+    if (action) where['action'] = action
+    if (search) {
+      where['OR'] = [
+        { action: { contains: search, mode: 'insensitive' } },
+        { entityType: { contains: search, mode: 'insensitive' } },
+        { entityId: { contains: search, mode: 'insensitive' } },
+      ]
+    }
+
+    const [entries, total] = await Promise.all([
+      fastify.prisma.auditLog.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limitNum,
+        include: {
+          user: { select: { name: true, email: true } },
+          project: { select: { name: true } },
+        },
+      }),
+      fastify.prisma.auditLog.count({ where }),
+    ])
+
+    return reply.send({ entries, total })
+  })
 }
 
 export default projectsModule

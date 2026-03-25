@@ -27,6 +27,173 @@ export type DeviceType =
   | 'ac-visitor-kiosk'
   | 'ac-elevator-ctrl'
   | 'ac-turnstile'
+  // Network Infrastructure (Phase 4)
+  | 'load-balancer'
+  | 'wan-optimizer'
+  | 'packet-broker'
+  | 'network-tap'
+  | 'content-filter'
+  | 'ddos-scrubber'
+  | 'dns-server'
+  | 'radius-server'
+  | 'proxy-server'
+  | 'siem-server'
+  | 'log-server'
+  // Wireless and Cellular (Phase 4)
+  | 'wireless-controller'
+  | 'cellular-gateway'
+  | 'cellular-modem'
+  | 'satellite-modem'
+  | 'lte-router'
+  | 'sd-wan-appliance'
+  // Compute and Virtualization (Phase 4)
+  | 'hypervisor'
+  | 'virtual-machine'
+  | 'container-host'
+  | 'blade-chassis'
+  | 'blade-server'
+  | 'server-rack'
+  | 'thin-client'
+  | 'gpu-server'
+  // Storage (Phase 4)
+  | 'san-switch'
+  | 'tape-library'
+  | 'backup-appliance'
+  | 'object-storage'
+  // Power and Environmental (Phase 4)
+  | 'ups'
+  | 'pdu'
+  | 'environmental-sensor'
+  | 'generator'
+  | 'cooling-unit'
+  // Unified Communications (Phase 4)
+  | 'pbx-server'
+  | 'sbc'
+  | 'voip-gateway'
+  | 'video-conference-unit'
+  // Industrial and OT (Phase 4)
+  | 'rtu'
+  | 'dcs'
+  | 'sis-controller'
+  | 'historian-server'
+  | 'scada-server'
+  | 'ied'
+  | 'protocol-converter'
+  | 'data-diode'
+  // Physical Security additions (Phase 4)
+  | 'nvr'
+  | 'dvr'
+  | 'video-analytics-server'
+  | 'license-plate-reader'
+  | 'intrusion-panel'
+  | 'fire-panel-gateway'
+  // Smart Building (Phase 4)
+  | 'bas-controller'
+  | 'hvac-controller'
+  | 'lighting-controller'
+  | 'energy-meter'
+  | 'bacnet-router'
+  | 'elevator-controller'
+  // Healthcare (Phase 4)
+  | 'medical-device'
+  | 'infusion-pump'
+  | 'patient-monitor'
+  | 'emr-server'
+  | 'pacs-server'
+  | 'nurse-call-server'
+  // Cloud and Internet symbolic nodes (Phase 4)
+  | 'cloud-aws'
+  | 'cloud-azure'
+  | 'cloud-gcp'
+  | 'cloud-m365'
+  | 'cloud-saas'
+  | 'colocation-fabric'
+  | 'isp-handoff'
+
+// Phase 4: typed connection system
+export type ConnectionType =
+  // Layer 2 -- Physical and Local
+  | 'ethernet-copper'
+  | 'ethernet-fiber'
+  | 'ethernet-sfp'
+  | 'ethernet-dac'
+  | 'wifi'
+  | 'wifi-backhaul'
+  | 'bluetooth'
+  | 'serial-console'
+  | 'can-bus'
+  | 'fieldbus'
+  | 'oob-console'
+  // Layer 3 -- Routed and WAN
+  | 'routed-static'
+  | 'ospf'
+  | 'bgp'
+  | 'eigrp'
+  | 'mpls'
+  | 'sd-wan'
+  // VPN and Tunneling
+  | 'site-to-site-ipsec'
+  | 'site-to-site-ssl'
+  | 'ssl-vpn-client'
+  | 'wireguard'
+  | 'gre-tunnel'
+  | 'vxlan'
+  | 'geneve'
+  | 'ipsec-dmvpn'
+  | 'l2tp'
+  // VLAN and Segmentation
+  | 'trunk-8021q'
+  | 'access-port'
+  | 'qinq'
+  | 'vlan-routing'
+  // Industrial / OT
+  | 'ethernet-ip'
+  | 'profinet'
+  | 'modbus-tcp'
+  | 'dnp3'
+  | 'bacnet'
+  | 'opc-ua'
+  | 'iec-61850'
+  // Storage
+  | 'iscsi'
+  | 'fibre-channel'
+  | 'nfs'
+  | 'smb'
+  // Physical Security and AV
+  | 'osdp'
+  | 'wiegand'
+  | 'poe'
+  | 'poe-plus'
+  | 'poe-bt'
+  | 'dante'
+  | 'aes67'
+  | 'smpte-st-2110'
+  // Management and Monitoring
+  | 'snmp'
+  | 'netflow'
+  | 'syslog'
+  | 'restful-api'
+  | 'ssh'
+  | 'rdp'
+  | 'fortilink'
+  | 'unifi-adopt'
+  // Cloud and Internet
+  | 'internet-access'
+  | 'saas-connection'
+  | 'cloud-vpn'
+  | 'direct-connect'
+  | 'peering'
+
+export interface VlanZone {
+  id: string
+  vlanId: number
+  label?: string
+  x: number
+  y: number
+  width: number
+  height: number
+  opacity: number
+}
 
 export interface PortMapping {
   portId: string
@@ -60,6 +227,15 @@ export interface DeviceData {
   rackPosition?: string
   portMappings?: PortMapping[]
   poe?: boolean
+  // Phase 4: vendor profile reference
+  vendorProfileId?: string
+  // Phase 4: Scout discovery fields
+  mac?: string
+  confidence?: number
+  scoutDiscovered?: boolean
+  discoveredAt?: string
+  // Phase 4: monitoring status
+  monitoringStatus?: 'online' | 'offline' | 'warning' | 'unconfigured'
   [key: string]: unknown
 }
 
@@ -97,13 +273,16 @@ export type NetworkProtocol =
   | 'custom'
 
 export interface ConnectionData {
+  connectionType?: ConnectionType
   sourcePort?: string
   targetPort?: string
-  mediaType?: 'copper' | 'fiber' | 'wireless' | 'sfp' | 'wan' | 'vpn'
-  speed?: '10M' | '100M' | '1G' | '10G' | 'variable'
+  mediaType?: 'copper' | 'fiber' | 'wireless' | 'sfp' | 'wan' | 'vpn' | 'dac' | 'serial' | 'fc'
+  speed?: '10M' | '100M' | '1G' | '10G' | '25G' | '40G' | '100G' | 'variable' | 'custom'
   vlanTag?: number
   trunkVlans?: number[]
+  nativeVlan?: number
   poe?: boolean
+  poeClass?: string
   uplink?: boolean
   status?: 'active' | 'planned' | 'deprecated' | 'simulated-down'
   notes?: string
@@ -111,6 +290,29 @@ export interface ConnectionData {
   protocol?: string
   protocols?: NetworkProtocol[]
   customProtocol?: string
+  // VPN / IPsec fields
+  peerIpA?: string
+  peerIpB?: string
+  localSubnet?: string
+  remoteSubnet?: string
+  ikeVersion?: 1 | 2
+  psk?: string
+  phase1Proposal?: string
+  phase2Proposal?: string
+  // BGP fields
+  localAs?: number
+  remoteAs?: number
+  bgpType?: 'ebgp' | 'ibgp'
+  // OSPF fields
+  ospfArea?: string
+  ospfCost?: number
+  // MPLS / SD-WAN
+  providerName?: string
+  circuitId?: string
+  cirMbps?: number
+  // WireGuard
+  allowedIps?: string[]
+  keepaliveInterval?: number
   [key: string]: unknown
 }
 
@@ -138,6 +340,9 @@ export interface TopologyMetadata {
   gridEnabled: boolean
   snapToGrid: boolean
   theme: string
+  // Phase 4: VLAN visual system
+  vlanColors?: Record<number, string>
+  vlanZones?: VlanZone[]
 }
 
 export interface TopologySnapshot {
@@ -282,4 +487,205 @@ export interface ProjectVersion {
   createdBy: string
   createdAt: Date
   isAutosave: boolean
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 4: Scout Discovery types
+// ─────────────────────────────────────────────────────────────
+
+export type ScoutScanMode = 'quick' | 'standard' | 'deep'
+export type ScoutDiscoveryStatus = 'pending' | 'scanning' | 'complete' | 'expired'
+
+export interface ScoutDiscovery {
+  id: string
+  orgId: string
+  projectId?: string | null
+  createdBy: string
+  scanMode: ScoutScanMode
+  status: ScoutDiscoveryStatus
+  startedAt?: Date | null
+  completedAt?: Date | null
+  summary?: ScoutSummary | null
+  scoutVersion?: string | null
+  hostOs?: string | null
+  hostIp?: string | null
+  token?: string
+  wsUrl?: string
+  expiresAt?: Date | null
+}
+
+export interface ScoutSummary {
+  devicesFound: number
+  connectionsFound: number
+  vlansFound: number
+  subnetsFound: number
+  scanDurationSeconds: number
+  scanMode: ScoutScanMode
+}
+
+export interface ScoutDeviceMessage {
+  type: 'device'
+  data: {
+    discoveryId: string
+    deviceId: string
+    hostname?: string
+    ipAddress?: string
+    subnet?: string
+    mac?: string
+    manufacturer?: string
+    model?: string
+    deviceType: DeviceType
+    os?: string
+    firmware?: string
+    location?: string
+    vlanId?: number
+    confidence: number
+    discoveredAt: string
+  }
+}
+
+export interface ScoutConnectionMessage {
+  type: 'connection'
+  data: {
+    discoveryId: string
+    connectionId: string
+    sourceDeviceId: string
+    targetDeviceId: string
+    sourcePort?: string
+    targetPort?: string
+    mediaType?: string
+    speed?: string
+    vlanTag?: number
+    trunkVlans?: number[]
+    discoveredVia: 'lldp' | 'cdp' | 'mac-table' | 'arp' | 'manual'
+    discoveredAt: string
+  }
+}
+
+export interface ScoutProgressMessage {
+  type: 'progress'
+  data: {
+    discoveryId: string
+    percentComplete: number
+    hostsChecked: number
+    hostsTotal: number
+    devicesFound: number
+    connectionsFound: number
+    currentSubnet?: string
+    phase: 'host-discovery' | 'device-id' | 'topology' | 'vlan' | 'deep'
+  }
+}
+
+export type ScoutStreamMessage =
+  | ScoutDeviceMessage
+  | ScoutConnectionMessage
+  | { type: 'vlan'; data: Record<string, unknown> }
+  | ScoutProgressMessage
+  | { type: 'complete'; data: { discoveryId: string; summary: ScoutSummary } }
+  | { type: 'error'; data: { message: string } }
+
+// ─────────────────────────────────────────────────────────────
+// Phase 4: Monitoring types
+// ─────────────────────────────────────────────────────────────
+
+export interface MonitoringSnapshot {
+  id: string
+  projectId: string
+  deviceId: string
+  polledAt: Date
+  status: 'online' | 'offline' | 'warning'
+  uptimeSeconds?: number
+  cpuPct?: number
+  memoryPct?: number
+  data?: Record<string, unknown>
+}
+
+export interface MonitoringAlertRule {
+  id: string
+  projectId: string
+  deviceId?: string | null
+  ruleType: 'device_offline' | 'interface_down' | 'cpu_threshold' | 'memory_threshold'
+  threshold?: number
+  notifyEmails: string[]
+  enabled: boolean
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 4: External API key types
+// ─────────────────────────────────────────────────────────────
+
+export type ApiKeyScope =
+  | 'read:projects'
+  | 'write:projects'
+  | 'read:templates'
+  | 'write:configs'
+  | 'trigger:scout'
+  | 'read:compliance'
+  | 'write:validate'
+
+export interface OrgApiKey {
+  id: string
+  orgId: string
+  label: string
+  scopes: ApiKeyScope[]
+  createdBy: string
+  createdAt: Date
+  lastUsedAt?: Date | null
+  expiresAt?: Date | null
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 4: Favorites
+// ─────────────────────────────────────────────────────────────
+
+export interface UserFavorite {
+  userId: string
+  projectId: string
+  createdAt: Date
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 4: Project comments
+// ─────────────────────────────────────────────────────────────
+
+export interface ProjectComment {
+  id: string
+  projectId: string
+  nodeId?: string | null
+  userId: string
+  content: string
+  createdAt: Date
+  updatedAt: Date
+  resolved: boolean
+  user?: { id: string; name: string }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 4: Search index
+// ─────────────────────────────────────────────────────────────
+
+export interface ProjectSearchIndexEntry {
+  projectId: string
+  hostname?: string | null
+  ipAddress?: string | null
+  deviceType?: string | null
+  updatedAt: Date
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 4: Live push credential types
+// ─────────────────────────────────────────────────────────────
+
+export type LivePushVendor = 'unifi' | 'meraki' | 'fortinet' | 'panos' | 'aruba-cx'
+
+export interface OrgApiCredential {
+  id: string
+  orgId: string
+  vendor: LivePushVendor
+  credentialType: string
+  label: string
+  testedAt?: Date | null
+  testResult?: 'success' | 'failed' | null
+  createdBy: string
+  createdAt: Date
 }

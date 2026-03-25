@@ -1,7 +1,23 @@
+/**
+ * @deprecated UniFiJsonGenerator is superseded by UniFiGatewayGenerator (Phase 4 Pillar C).
+ * This file is kept for backward compatibility only. All new code should import from
+ * './UniFiGatewayGenerator' instead.
+ *
+ * UniFiGatewayGenerator produces:
+ *   1. config.gateway.json — EdgeOS-compatible JSON for UDM/USG
+ *   2. config-apply.sh     — REST API shell script for VLANs/SSIDs
+ */
+
+export {
+  generateUniFiGateway as generateUniFiGatewayConfig,
+  generateUniFiGatewayConfig as generateUniFiGatewayFiles,
+} from './UniFiGatewayGenerator.js'
+
 import type { TopologySnapshot, DeviceNode, VendorDeviceProfile, ConfigExportResult } from '@gridhive/shared'
 
 const INSTRUCTIONS = 'Import via UniFi Network Application > Settings > System > Backup and Restore > Restore.'
 
+/** @deprecated Use generateUniFiGateway from UniFiGatewayGenerator instead. */
 export function generateUniFiJson(
   topology: TopologySnapshot,
   device: DeviceNode,

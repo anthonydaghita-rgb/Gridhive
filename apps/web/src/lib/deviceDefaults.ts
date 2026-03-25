@@ -69,7 +69,7 @@ export function getDeviceDefaults(deviceType: DeviceType): Partial<DeviceData> {
 
 function getDefaultHostname(deviceType: DeviceType): string {
   const timestamp = Date.now().toString().slice(-4)
-  const prefixes: Record<DeviceType, string> = {
+  const prefixes: Partial<Record<DeviceType, string>> = {
     'firewall': 'FW',
     'firewall-edge': 'FW-EDGE',
     'switch-l2': 'SW-L2',
@@ -102,7 +102,7 @@ function getDefaultHostname(deviceType: DeviceType): string {
 }
 
 function getDefaultLabel(deviceType: DeviceType): string {
-  const labels: Record<DeviceType, string> = {
+  const labels: Partial<Record<DeviceType, string>> = {
     'firewall': 'Firewall',
     'firewall-edge': 'Edge Firewall',
     'switch-l2': 'L2 Switch',

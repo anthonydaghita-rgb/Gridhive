@@ -17,15 +17,23 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  orgMembers   OrgMember[]
-  projects     Project[]    @relation("ProjectCreator")
-  versions     ProjectVersion[] @relation("VersionCreator")
-  validations  ValidationRun[]
-  simulations  SimulationRun[]
-  templates    Template[]
-  auditLogs    AuditLog[]
-  sessions     Session[]
-  accounts     Account[]
+  orgMembers       OrgMember[]
+  projects         Project[]    @relation("ProjectCreator")
+  versions         ProjectVersion[] @relation("VersionCreator")
+  validations      ValidationRun[]
+  simulations      SimulationRun[]
+  templates        Template[]
+  auditLogs        AuditLog[]
+  sessions         Session[]
+  accounts         Account[]
+  favorites        UserProjectFavorite[]
+  comments         ProjectComment[]
+  scoutDiscoveries ScoutDiscovery[]     @relation("ScoutCreator")
+  apiCredentials   OrgApiCredential[]   @relation("CredentialCreator")
+  apiKeys          OrgApiKey[]          @relation("ApiKeyCreator")
+  webhooks         OrgWebhook[]         @relation("WebhookCreator")
+  alertRules       MonitoringAlertRule[] @relation("AlertRuleCreator")
+  nodeLocks        ProjectNodeLock[]    @relation("NodeLockUser")
 
   @@map("users")
 }
@@ -84,11 +92,15 @@ model Organization {
   logoBase64   String?
   createdAt    DateTime @default(now())
 
-  members    OrgMember[]
-  projects   Project[]
-  folders    Folder[]
-  templates  Template[]
-  auditLogs  AuditLog[]
+  members          OrgMember[]
+  projects         Project[]
+  folders          Folder[]
+  templates        Template[]
+  auditLogs        AuditLog[]
+  scoutDiscoveries ScoutDiscovery[]
+  apiCredentials   OrgApiCredential[]
+  apiKeys          OrgApiKey[]
+  webhooks         OrgWebhook[]
 
   @@map("organizations")
 }
@@ -142,13 +154,21 @@ model Project {
   archivedAt     DateTime?
   archivedBy     String?
 
-  org         Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  folder      Folder?          @relation(fields: [folderId], references: [id])
-  creator     User             @relation("ProjectCreator", fields: [createdBy], references: [id])
-  versions    ProjectVersion[]
-  validations ValidationRun[]
-  simulations SimulationRun[]
-  auditLogs   AuditLog[]
+  org              Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  folder           Folder?          @relation(fields: [folderId], references: [id])
+  creator          User             @relation("ProjectCreator", fields: [createdBy], references: [id])
+  versions         ProjectVersion[]
+  validations      ValidationRun[]
+  simulations      SimulationRun[]
+  auditLogs        AuditLog[]
+  favorites        UserProjectFavorite[]
+  comments         ProjectComment[]
+  searchIndex      ProjectSearchIndex[]
+  scoutDiscoveries ScoutDiscovery[]
+  monitoringSnaps  MonitoringSnapshot[]
+  alertRules       MonitoringAlertRule[]
+  alertEvents      MonitoringAlertEvent[]
+  nodeLocks        ProjectNodeLock[]
 
   @@map("projects")
 }
@@ -239,6 +259,7 @@ model AuditLog {
   entityId   String?
   before     Json?
   after      Json?
+  ipAddress  String?
   createdAt  DateTime @default(now())
 
   org     Organization? @relation(fields: [orgId], references: [id])
@@ -246,4 +267,226 @@ model AuditLog {
   user    User          @relation(fields: [userId], references: [id])
 
   @@map("audit_logs")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 4 Migration 1: Project Management
+// ─────────────────────────────────────────────────────────────
+
+model ProjectSearchIndex {
+  id         String   @id @default(cuid())
+  projectId  String
+  hostname   String?
+  ipAddress  String?
+  deviceType String?
+  updatedAt  DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([hostname])
+  @@index([ipAddress])
+  @@map("project_search_index")
+}
+
+model UserProjectFavorite {
+  id        String   @id @default(cuid())
+  userId    String
+  projectId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
+  @@map("user_project_favorites")
+}
+
+model ProjectComment {
+  id        String   @id @default(cuid())
+  projectId String
+  nodeId    String?
+  userId    String
+  content   String
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@index([projectId])
+  @@map("project_comments")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 4 Migration 2: Scout Discoveries
+// ─────────────────────────────────────────────────────────────
+
+model ScoutDiscovery {
+  id               String    @id @default(cuid())
+  orgId            String
+  projectId        String?
+  createdBy        String
+  pairingTokenHash String
+  scanMode         String    @default("standard")
+  status           String    @default("pending")
+  startedAt        DateTime?
+  completedAt      DateTime?
+  summary          Json?
+  topologySnapshot Json?
+  appliedAt        DateTime?
+  appliedBy        String?
+  scoutVersion     String?
+  hostOs           String?
+  hostIp           String?
+  expiresAt        DateTime?
+  createdAt        DateTime  @default(now())
+
+  org     Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  project Project?     @relation(fields: [projectId], references: [id])
+  creator User         @relation("ScoutCreator", fields: [createdBy], references: [id])
+
+  @@index([orgId])
+  @@index([status])
+  @@map("scout_discoveries")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 4 Migration 3: API Credentials (Live Push)
+// ─────────────────────────────────────────────────────────────
+
+model OrgApiCredential {
+  id             String    @id @default(cuid())
+  orgId          String
+  vendor         String
+  credentialType String
+  encryptedData  String
+  label          String
+  testedAt       DateTime?
+  testResult     String?
+  createdBy      String
+  createdAt      DateTime  @default(now())
+
+  org     Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  creator User         @relation("CredentialCreator", fields: [createdBy], references: [id])
+
+  @@index([orgId, vendor])
+  @@map("org_api_credentials")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 4 Migration 4: Monitoring
+// ─────────────────────────────────────────────────────────────
+
+model MonitoringSnapshot {
+  id            String   @id @default(cuid())
+  projectId     String
+  deviceId      String
+  polledAt      DateTime @default(now())
+  status        String
+  uptimeSeconds Int?
+  cpuPct        Float?
+  memoryPct     Float?
+  data          Json?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, deviceId])
+  @@index([polledAt])
+  @@map("monitoring_snapshots")
+}
+
+model MonitoringAlertRule {
+  id           String    @id @default(cuid())
+  projectId    String
+  deviceId     String?
+  ruleType     String
+  threshold    Float?
+  notifyEmails String[]  @default([])
+  enabled      Boolean   @default(true)
+  createdBy    String
+  createdAt    DateTime  @default(now())
+
+  project      Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creator      User                   @relation("AlertRuleCreator", fields: [createdBy], references: [id])
+  alertEvents  MonitoringAlertEvent[] @relation("AlertEvents")
+
+  @@index([projectId])
+  @@map("monitoring_alert_rules")
+}
+
+model MonitoringAlertEvent {
+  id          String    @id @default(cuid())
+  projectId   String
+  deviceId    String
+  ruleId      String
+  triggeredAt DateTime  @default(now())
+  resolvedAt  DateTime?
+  summary     String
+
+  project Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  rule    MonitoringAlertRule @relation("AlertEvents", fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("monitoring_alert_events")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 4 Migration 5: External API Access
+// ─────────────────────────────────────────────────────────────
+
+model OrgApiKey {
+  id         String    @id @default(cuid())
+  orgId      String
+  keyHash    String    @unique
+  label      String
+  scopes     String[]  @default([])
+  createdBy  String
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  org     Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  creator User         @relation("ApiKeyCreator", fields: [createdBy], references: [id])
+
+  @@index([orgId])
+  @@map("org_api_keys")
+}
+
+model OrgWebhook {
+  id        String   @id @default(cuid())
+  orgId     String
+  url       String
+  events    String[] @default([])
+  secretHash String?
+  enabled   Boolean  @default(true)
+  createdBy String
+  createdAt DateTime @default(now())
+
+  org     Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  creator User         @relation("WebhookCreator", fields: [createdBy], references: [id])
+
+  @@index([orgId])
+  @@map("org_webhooks")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 4 Migration 6: Collaboration Locks
+// ─────────────────────────────────────────────────────────────
+
+model ProjectNodeLock {
+  id        String   @id @default(cuid())
+  projectId String
+  nodeId    String
+  lockedBy  String
+  lockedAt  DateTime @default(now())
+  expiresAt DateTime
+
+  project  Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  lockUser User    @relation("NodeLockUser", fields: [lockedBy], references: [id])
+
+  @@unique([projectId, nodeId])
+  @@map("project_node_locks")
 }

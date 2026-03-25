@@ -28,10 +28,34 @@ import {
   ACVisitorKioskIcon,
   ACElevatorCtrlIcon,
   ACTurnstileIcon,
+  // Phase 4 icons
+  LoadBalancerIcon,
+  UPSIcon,
+  PDUIcon,
+  HypervisorIcon,
+  CloudAWSIcon,
+  CloudAzureIcon,
+  CloudGenericIcon,
+  CellularGatewayIcon,
+  WirelessControllerIcon,
+  SANSwitchIcon,
+  PBXIcon,
+  NVRIcon,
+  EnvironmentalSensorIcon,
+  SIEMIcon,
+  ISPHandoffIcon,
+  VideoConferenceIcon,
+  BASControllerIcon,
+  MedicalDeviceIcon,
+  SatelliteModemIcon,
+  DataDiodeIcon,
+  SCADAServerIcon,
+  GenericNetworkIcon,
 } from './DeviceIcons'
 import { createElement } from 'react'
 
-const DEVICE_ICON_MAP: Record<DeviceType, (props: { className?: string; size?: number }) => ReactNode> = {
+const DEVICE_ICON_MAP: Partial<Record<DeviceType, (props: { className?: string; size?: number }) => ReactNode>> = {
+  // Phase 1-3
   'firewall': FirewallIcon,
   'firewall-edge': FirewallEdgeIcon,
   'switch-l2': SwitchL2Icon,
@@ -59,11 +83,93 @@ const DEVICE_ICON_MAP: Record<DeviceType, (props: { className?: string; size?: n
   'ac-visitor-kiosk': ACVisitorKioskIcon,
   'ac-elevator-ctrl': ACElevatorCtrlIcon,
   'ac-turnstile': ACTurnstileIcon,
+  // Phase 4 — Network Infrastructure
+  'load-balancer': LoadBalancerIcon,
+  'wan-optimizer': RouterIcon,
+  'packet-broker': GenericNetworkIcon,
+  'network-tap': GenericNetworkIcon,
+  'content-filter': FirewallIcon,
+  'ddos-scrubber': FirewallIcon,
+  'dns-server': ServerIcon,
+  'radius-server': ServerIcon,
+  'proxy-server': ServerIcon,
+  'siem-server': SIEMIcon,
+  'log-server': ServerIcon,
+  // Phase 4 — Wireless/Cellular
+  'wireless-controller': WirelessControllerIcon,
+  'cellular-gateway': CellularGatewayIcon,
+  'cellular-modem': CellularGatewayIcon,
+  'satellite-modem': SatelliteModemIcon,
+  'lte-router': CellularGatewayIcon,
+  'sd-wan-appliance': RouterIcon,
+  // Phase 4 — Compute
+  'hypervisor': HypervisorIcon,
+  'virtual-machine': ServerIcon,
+  'container-host': ServerIcon,
+  'blade-chassis': ServerIcon,
+  'blade-server': ServerIcon,
+  'server-rack': ServerIcon,
+  'thin-client': WorkstationIcon,
+  'gpu-server': ServerIcon,
+  // Phase 4 — Storage
+  'san-switch': SANSwitchIcon,
+  'tape-library': NASIcon,
+  'backup-appliance': NASIcon,
+  'object-storage': NASIcon,
+  // Phase 4 — Power & Environmental
+  'ups': UPSIcon,
+  'pdu': PDUIcon,
+  'environmental-sensor': EnvironmentalSensorIcon,
+  'generator': UPSIcon,
+  'cooling-unit': EnvironmentalSensorIcon,
+  // Phase 4 — Unified Comms
+  'pbx-server': PBXIcon,
+  'sbc': RouterIcon,
+  'voip-gateway': VoIPPhoneIcon,
+  'video-conference-unit': VideoConferenceIcon,
+  // Phase 4 — Industrial OT
+  'rtu': PLCIcon,
+  'dcs': PLCIcon,
+  'sis-controller': PLCIcon,
+  'historian-server': ServerIcon,
+  'scada-server': SCADAServerIcon,
+  'ied': PLCIcon,
+  'protocol-converter': RouterIcon,
+  'data-diode': DataDiodeIcon,
+  // Phase 4 — Physical Security
+  'nvr': NVRIcon,
+  'dvr': NVRIcon,
+  'video-analytics-server': SIEMIcon,
+  'license-plate-reader': CameraIcon,
+  'intrusion-panel': ACControllerIcon,
+  'fire-panel-gateway': ACControllerIcon,
+  // Phase 4 — Smart Building
+  'bas-controller': BASControllerIcon,
+  'hvac-controller': BASControllerIcon,
+  'lighting-controller': BASControllerIcon,
+  'energy-meter': EnvironmentalSensorIcon,
+  'bacnet-router': RouterIcon,
+  'elevator-controller': ACElevatorCtrlIcon,
+  // Phase 4 — Healthcare
+  'medical-device': MedicalDeviceIcon,
+  'infusion-pump': MedicalDeviceIcon,
+  'patient-monitor': MedicalDeviceIcon,
+  'emr-server': ServerIcon,
+  'pacs-server': ServerIcon,
+  'nurse-call-server': ServerIcon,
+  // Phase 4 — Cloud
+  'cloud-aws': CloudAWSIcon,
+  'cloud-azure': CloudAzureIcon,
+  'cloud-gcp': CloudGenericIcon,
+  'cloud-m365': CloudGenericIcon,
+  'cloud-saas': CloudGenericIcon,
+  'colocation-fabric': GenericNetworkIcon,
+  'isp-handoff': ISPHandoffIcon,
 }
 
 export function getDeviceIcon(deviceType: DeviceType, props?: { className?: string; size?: number }): ReactNode {
   const Icon = DEVICE_ICON_MAP[deviceType] || ServerIcon
-  return createElement(Icon as React.ComponentType<{ className?: string; size?: number }>, props)
+  return createElement(Icon as React.ComponentType<{ className?: string; size?: number }>, props || {})
 }
 
 export * from './DeviceIcons'
