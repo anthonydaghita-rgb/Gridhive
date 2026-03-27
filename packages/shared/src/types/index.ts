@@ -272,7 +272,7 @@ export type NetworkProtocol =
   | 'none'
   | 'custom'
 
-export interface ConnectionData {
+export type ConnectionData = {
   connectionType?: ConnectionType
   sourcePort?: string
   targetPort?: string
@@ -313,8 +313,7 @@ export interface ConnectionData {
   // WireGuard
   allowedIps?: string[]
   keepaliveInterval?: number
-  [key: string]: unknown
-}
+} & Record<string, unknown>
 
 export interface DeviceNode {
   id: string
