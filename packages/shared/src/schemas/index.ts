@@ -1,13 +1,8 @@
 import { z } from 'zod'
+import type { DeviceType } from '../types/index.js'
 
-export const DeviceTypeSchema = z.enum([
-  'firewall', 'switch-l2', 'switch-l3', 'router', 'server',
-  'workstation', 'printer', 'wireless-ap', 'camera', 'voip-phone',
-  'nas', 'internet', 'plc', 'sensor', 'patch-panel', 'hmi', 'firewall-edge',
-  'ac-server', 'ac-controller', 'ac-reader', 'ac-door-hardware',
-  'ac-intercom', 'ac-biometric', 'ac-key-pad', 'ac-visitor-kiosk',
-  'ac-elevator-ctrl', 'ac-turnstile',
-])
+// Accepts any string at runtime but typed as DeviceType for TypeScript consumers
+export const DeviceTypeSchema = z.string() as z.ZodType<DeviceType>
 
 export const PortMappingSchema = z.object({
   portId: z.string(),
@@ -59,7 +54,7 @@ export const ConnectionDataSchema = z.object({
 
 export const DeviceNodeSchema = z.object({
   id: z.string(),
-  type: z.string(),
+  type: DeviceTypeSchema,
   position: z.object({ x: z.number(), y: z.number() }),
   data: DeviceDataSchema,
 })
@@ -68,8 +63,8 @@ export const ConnectionEdgeSchema = z.object({
   id: z.string(),
   source: z.string(),
   target: z.string(),
-  data: ConnectionDataSchema.optional(),
-})
+  data: ConnectionDataSchema.passthrough().optional(),
+}) as unknown as z.ZodType<import('../types/index.js').ConnectionEdge>
 
 export const TopologySnapshotSchema = z.object({
   nodes: z.array(DeviceNodeSchema),

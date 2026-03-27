@@ -92,10 +92,10 @@ export const scoutStreamModule: FastifyPluginAsync = async (fastify) => {
           completedAt: new Date(),
           summary: completeData.summary as object | undefined,
           topologySnapshot: {
-            nodes: completeData.nodes ?? [],
-            edges: completeData.edges ?? [],
-            vlans: completeData.vlans ?? [],
-          },
+            nodes: (completeData.nodes ?? []) as object[],
+            edges: (completeData.edges ?? []) as object[],
+            vlans: (completeData.vlans ?? []) as object[],
+          } as object,
         },
       })
     }
@@ -124,3 +124,5 @@ export const scoutStreamModule: FastifyPluginAsync = async (fastify) => {
     })
   })
 }
+
+export default scoutStreamModule
