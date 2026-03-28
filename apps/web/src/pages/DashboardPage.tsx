@@ -36,7 +36,7 @@ function relativeTime(date: string | Date): string {
 }
 
 export function DashboardPage() {
-  const { user, logout } = useAuthStore()
+  const { user, logout, token } = useAuthStore()
   const navigate = useNavigate()
   const [orgs, setOrgs] = useState<Organization[]>([])
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null)
@@ -58,9 +58,16 @@ export function DashboardPage() {
   const [createOrgName, setCreateOrgName] = useState('')
   const [createOrgError, setCreateOrgError] = useState('')
 
+  // Redirect to login if user has no session token (e.g. duplicate registration)
+  useEffect(() => {
+    if (user && !token) {
+      logout().finally(() => navigate('/login'))
+    }
+  }, [user, token, logout, navigate])
+
   // Load user's orgs on mount — auto-create a personal workspace if none exist
   useEffect(() => {
-    if (!user) return
+    if (!user || !token) return
     api.get<Organization[]>('/orgs').then(async orgsList => {
       let list = Array.isArray(orgsList) ? orgsList : []
 

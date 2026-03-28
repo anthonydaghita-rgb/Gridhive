@@ -40,7 +40,12 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true })
         try {
           const result = await api.auth.register(email, password, name)
-          set({ user: result.user, token: result.token ?? null, isLoading: false })
+          if (!result.token) {
+            // Email already registered — better-auth returns token:null in this case
+            set({ isLoading: false })
+            throw new Error('An account with this email already exists. Please sign in instead.')
+          }
+          set({ user: result.user, token: result.token, isLoading: false })
         } catch (error) {
           set({ isLoading: false })
           throw error
