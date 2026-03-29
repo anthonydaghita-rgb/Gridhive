@@ -38,12 +38,16 @@ import { PLCNode } from './nodes/PLCNode'
 import { SensorNode } from './nodes/SensorNode'
 import { PatchPanelNode } from './nodes/PatchPanelNode'
 import { HMINode } from './nodes/HMINode'
+import { GenericDeviceNode } from './nodes/GenericDeviceNode'
 import { NetworkEdge } from './edges/NetworkEdge'
 import { getDeviceDefaults } from '../../lib/deviceDefaults'
 import type { DeviceType, DeviceData, ConnectionData } from '@gridhive/shared'
 import type { Node, Edge } from '@xyflow/react'
 
+const G = GenericDeviceNode
+
 const nodeTypes: NodeTypes = {
+  // Phase 1–3 nodes (dedicated components)
   'firewall': FirewallNode,
   'firewall-edge': FirewallNode,
   'switch-l2': SwitchL2Node,
@@ -61,6 +65,41 @@ const nodeTypes: NodeTypes = {
   'sensor': SensorNode,
   'patch-panel': PatchPanelNode,
   'hmi': HMINode,
+  // Access control (Phase 1–3)
+  'ac-server': G, 'ac-controller': G, 'ac-reader': G, 'ac-door-hardware': G,
+  'ac-intercom': G, 'ac-biometric': G, 'ac-key-pad': G, 'ac-visitor-kiosk': G,
+  'ac-elevator-ctrl': G, 'ac-turnstile': G,
+  // Phase 4 — Network Infrastructure
+  'load-balancer': G, 'wan-optimizer': G, 'content-filter': G, 'ddos-scrubber': G,
+  'dns-server': G, 'radius-server': G, 'proxy-server': G, 'siem-server': G, 'log-server': G,
+  'network-tap': G, 'packet-broker': G,
+  // Phase 4 — Wireless and Cellular
+  'wireless-controller': G, 'cellular-gateway': G, 'cellular-modem': G,
+  'satellite-modem': G, 'lte-router': G, 'sd-wan-appliance': G,
+  // Phase 4 — Compute and Virtualization
+  'hypervisor': G, 'virtual-machine': G, 'container-host': G,
+  'blade-chassis': G, 'blade-server': G, 'server-rack': G, 'thin-client': G, 'gpu-server': G,
+  // Phase 4 — Storage
+  'san-switch': G, 'tape-library': G, 'backup-appliance': G, 'object-storage': G,
+  // Phase 4 — Power and Environmental
+  'ups': G, 'pdu': G, 'environmental-sensor': G, 'generator': G, 'cooling-unit': G,
+  // Phase 4 — Unified Communications
+  'pbx-server': G, 'sbc': G, 'voip-gateway': G, 'video-conference-unit': G,
+  // Phase 4 — Industrial OT
+  'rtu': G, 'dcs': G, 'sis-controller': G, 'historian-server': G,
+  'scada-server': G, 'ied': G, 'protocol-converter': G, 'data-diode': G,
+  // Phase 4 — Physical Security additions
+  'nvr': G, 'dvr': G, 'video-analytics-server': G, 'license-plate-reader': G,
+  'intrusion-panel': G, 'fire-panel-gateway': G,
+  // Phase 4 — Smart Building
+  'bas-controller': G, 'hvac-controller': G, 'lighting-controller': G,
+  'energy-meter': G, 'bacnet-router': G, 'elevator-controller': G,
+  // Phase 4 — Healthcare
+  'medical-device': G, 'infusion-pump': G, 'patient-monitor': G,
+  'emr-server': G, 'pacs-server': G, 'nurse-call-server': G,
+  // Phase 4 — Cloud and Internet
+  'cloud-aws': G, 'cloud-azure': G, 'cloud-gcp': G, 'cloud-m365': G,
+  'cloud-saas': G, 'colocation-fabric': G, 'isp-handoff': G,
 }
 
 const edgeTypes: EdgeTypes = {

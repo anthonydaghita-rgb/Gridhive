@@ -702,11 +702,11 @@ function ProjectCard({
 
   return (
     <div
-      className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden cursor-pointer hover:border-blue-500/50 transition-colors"
+      className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden cursor-pointer hover:border-blue-500/50 transition-colors relative"
       onClick={() => { if (showMenu) setShowMenu(false); else onOpen() }}
     >
       {/* Thumbnail */}
-      <div className="h-28 bg-gray-800 relative overflow-hidden">
+      <div className="h-28 bg-gray-800 overflow-hidden">
         {thumbnail ? (
           <img src={thumbnail} alt="Project thumbnail" className="w-full h-full object-cover" />
         ) : (
@@ -716,31 +716,31 @@ function ProjectCard({
             </div>
           </div>
         )}
+      </div>
 
-        {/* Context menu button — always visible */}
-        <div className="absolute top-2 right-2" onClick={e => e.stopPropagation()}>
-          <div className="relative">
-            <button
-              onClick={() => setShowMenu(!showMenu)}
-              className="w-7 h-7 bg-gray-900/90 hover:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:text-white transition-colors"
-            >
-              <MoreHorizontal className="w-4 h-4" />
-            </button>
-            {showMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20 min-w-[140px]">
-                <button onClick={() => { setShowMenu(false); onOpen() }} className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center gap-2">
-                  <FolderOpen className="w-3.5 h-3.5" />Open
-                </button>
-                <button onClick={() => { setShowMenu(false); onDuplicate() }} className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center gap-2">
-                  <Copy className="w-3.5 h-3.5" />Duplicate
-                </button>
-                <div className="border-t border-gray-700 my-1" />
-                <button onClick={() => { setShowMenu(false); onDelete() }} className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-gray-700 transition-colors flex items-center gap-2">
-                  <Trash2 className="w-3.5 h-3.5" />Move to Trash
-                </button>
-              </div>
-            )}
-          </div>
+      {/* Context menu button — positioned on card, outside overflow-hidden thumbnail */}
+      <div className="absolute top-2 right-2 z-10" onClick={e => e.stopPropagation()}>
+        <div className="relative">
+          <button
+            onClick={() => setShowMenu(!showMenu)}
+            className="w-7 h-7 bg-gray-900/90 hover:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+          >
+            <MoreHorizontal className="w-4 h-4" />
+          </button>
+          {showMenu && (
+            <div className="absolute right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20 min-w-[140px]">
+              <button onClick={() => { setShowMenu(false); onOpen() }} className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center gap-2">
+                <FolderOpen className="w-3.5 h-3.5" />Open
+              </button>
+              <button onClick={() => { setShowMenu(false); onDuplicate() }} className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center gap-2">
+                <Copy className="w-3.5 h-3.5" />Duplicate
+              </button>
+              <div className="border-t border-gray-700 my-1" />
+              <button onClick={() => { setShowMenu(false); onDelete() }} className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-gray-700 transition-colors flex items-center gap-2">
+                <Trash2 className="w-3.5 h-3.5" />Move to Trash
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
