@@ -40,7 +40,9 @@ import { PatchPanelNode } from './nodes/PatchPanelNode'
 import { HMINode } from './nodes/HMINode'
 import { GenericDeviceNode } from './nodes/GenericDeviceNode'
 import { NetworkEdge } from './edges/NetworkEdge'
+import { toast } from 'sonner'
 import { getDeviceDefaults } from '../../lib/deviceDefaults'
+import { validateConnection } from '../../lib/connectionRules'
 import type { DeviceType, DeviceData, ConnectionData } from '@gridhive/shared'
 import type { Node, Edge } from '@xyflow/react'
 
@@ -131,6 +133,22 @@ function Canvas() {
   }, [fitViewNodeIds, fitView, clearFitView])
 
   const onConnect: OnConnect = useCallback((connection: Connection) => {
+    // Validate compatibility between source and target device types
+    const sourceNode = nodes.find(n => n.id === connection.source)
+    const targetNode = nodes.find(n => n.id === connection.target)
+    if (sourceNode && targetNode) {
+      const sourceType = (sourceNode.data as DeviceData).deviceType as DeviceType
+      const targetType = (targetNode.data as DeviceData).deviceType as DeviceType
+      const result = validateConnection(sourceType, targetType)
+      if (!result.valid) {
+        toast.error('Connection not allowed', {
+          description: result.reason,
+          duration: 6000,
+        })
+        return
+      }
+    }
+
     const newEdge: Edge<ConnectionData> = {
       ...connection,
       id: `edge-${Date.now()}`,
@@ -143,7 +161,7 @@ function Canvas() {
     }
     storeAddEdge(newEdge as Edge<ConnectionData>)
     setDirty(true)
-  }, [storeAddEdge, setDirty])
+  }, [nodes, storeAddEdge, setDirty])
 
   const onDrop = useCallback((event: React.DragEvent) => {
     event.preventDefault()

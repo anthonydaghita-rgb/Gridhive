@@ -95,3 +95,9 @@
 .form-input {
   @apply w-full bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors;
 }
+
+/* Data-flow animation for network edges */
+@keyframes gridhive-flow {
+  from { stroke-dashoffset: 32; }
+  to   { stroke-dashoffset: 0; }
+}
