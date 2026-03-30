@@ -5,7 +5,7 @@ import {
   Plus, Search, Folder, FolderPlus, MoreHorizontal, Trash2, Copy, Pencil,
   FolderOpen, AlertCircle, ChevronRight, Settings, LogOut, Shield,
   CheckCircle2, AlertTriangle, HelpCircle, Clock, ChevronDown,
-  ArrowUpDown, LayoutGrid, List
+  ArrowUpDown, LayoutGrid, List, Network
 } from 'lucide-react'
 import { useAuthStore } from '../stores/authStore'
 import { api } from '../lib/api'
@@ -353,6 +353,13 @@ export function DashboardPage() {
         </div>
         <div className="flex items-center gap-2">
           <span className="text-gray-400 text-sm">{user?.name}</span>
+          <button
+            onClick={() => navigate('/ipam')}
+            className="flex items-center gap-1.5 text-gray-400 hover:text-white text-sm px-2 py-1 rounded hover:bg-gray-800 transition-colors"
+          >
+            <Network className="w-4 h-4" />
+            IPAM
+          </button>
           <button
             onClick={() => navigate('/admin')}
             className="flex items-center gap-1.5 text-gray-400 hover:text-white text-sm px-2 py-1 rounded hover:bg-gray-800 transition-colors"

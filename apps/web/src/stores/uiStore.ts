@@ -8,6 +8,7 @@ type ActiveModal =
   | 'version-history'
   | 'save-version'
   | 'project-settings'
+  | 'proposal'
   | null
 
 export type BottomPanelTab = 'validation' | 'simulation' | 'compliance' | 'lateral-movement' | 'capacity'
@@ -21,6 +22,8 @@ interface UiStore {
   orgLogoBase64: string | null
   // Phase 5: canvas overlay modes
   canvasOverlay: 'none' | 'blast-radius' | 'capacity'
+  // Phase 5: editor view mode
+  editorView: 'topology' | 'rack'
 
   setLeftPanel: (open: boolean) => void
   setRightPanel: (open: boolean) => void
@@ -30,6 +33,7 @@ interface UiStore {
   closeModal: () => void
   setOrgLogo: (logo: string | null) => void
   setCanvasOverlay: (overlay: 'none' | 'blast-radius' | 'capacity') => void
+  setEditorView: (view: 'topology' | 'rack') => void
 }
 
 export const useUiStore = create<UiStore>((set) => ({
@@ -40,6 +44,7 @@ export const useUiStore = create<UiStore>((set) => ({
   activeModal: null,
   orgLogoBase64: null,
   canvasOverlay: 'none',
+  editorView: 'topology',
 
   setLeftPanel: (open) => set({ leftPanelOpen: open }),
   setRightPanel: (open) => set({ rightPanelOpen: open }),
@@ -49,4 +54,5 @@ export const useUiStore = create<UiStore>((set) => ({
   closeModal: () => set({ activeModal: null }),
   setOrgLogo: (logo) => set({ orgLogoBase64: logo }),
   setCanvasOverlay: (overlay) => set({ canvasOverlay: overlay }),
+  setEditorView: (view) => set({ editorView: view }),
 }))

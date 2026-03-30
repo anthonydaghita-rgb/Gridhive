@@ -8,18 +8,20 @@ import { CompliancePanel } from '../panels/BottomPanel/CompliancePanel'
 import { LateralMovementPanel } from '../panels/BottomPanel/LateralMovementPanel'
 import { CapacityPanel } from '../panels/BottomPanel/CapacityPanel'
 import { GridhiveCanvas } from '../canvas/GridhiveCanvas'
+import { RackDiagramView } from '../canvas/RackDiagramView'
 import { NewProjectModal } from '../modals/NewProjectModal'
 import { TemplateLibraryModal } from '../modals/TemplateLibraryModal'
 import { ExportModal } from '../modals/ExportModal'
 import { VersionHistoryModal } from '../modals/VersionHistoryModal'
 import { SaveVersionModal } from '../modals/SaveVersionModal'
 import { ProjectSettingsModal } from '../modals/ProjectSettingsModal'
+import { ProposalModal } from '../modals/ProposalModal'
 import { useUiStore, type BottomPanelTab } from '../../stores/uiStore'
 import { useProjectStore } from '../../stores/projectStore'
 import { api } from '../../lib/api'
 
 export function AppShell() {
-  const { leftPanelOpen, rightPanelOpen, bottomPanelOpen, bottomPanelTab, activeModal, setOrgLogo } = useUiStore()
+  const { leftPanelOpen, rightPanelOpen, bottomPanelOpen, bottomPanelTab, activeModal, setOrgLogo, editorView } = useUiStore()
   const { currentProject } = useProjectStore()
 
   // Load org logo when project is loaded
@@ -44,8 +46,8 @@ export function AppShell() {
 
         {/* Canvas Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 relative">
-            <GridhiveCanvas />
+          <div className="flex-1 relative overflow-hidden">
+            {editorView === 'rack' ? <RackDiagramView /> : <GridhiveCanvas />}
           </div>
 
           {/* Bottom Panel */}
@@ -84,6 +86,7 @@ export function AppShell() {
       {activeModal === 'version-history' && <VersionHistoryModal />}
       {activeModal === 'save-version' && <SaveVersionModal />}
       {activeModal === 'project-settings' && <ProjectSettingsModal />}
+      {activeModal === 'proposal' && <ProposalModal onClose={() => useUiStore.getState().closeModal()} />}
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Loader2, PanelLeft, PanelRight, PanelBottom, Download, LayoutTemplate, ShieldCheck, History, Settings, Save } from 'lucide-react'
+import { Loader2, PanelLeft, PanelRight, PanelBottom, Download, LayoutTemplate, ShieldCheck, History, Settings, Save, Server, Network, FileText } from 'lucide-react'
 import { GridhiveLogo } from '../GridhiveLogo'
 import { useProjectStore } from '../../stores/projectStore'
 import { useUiStore } from '../../stores/uiStore'
@@ -10,7 +10,7 @@ import { api } from '../../lib/api'
 export function TopToolbar() {
   const navigate = useNavigate()
   const { currentProject, isDirty, isSaving, isAutosaving, lastSavedAt, setSaving } = useProjectStore()
-  const { setActiveModal, setLeftPanel, leftPanelOpen, rightPanelOpen, setRightPanel, bottomPanelOpen, setBottomPanel, orgLogoBase64 } = useUiStore()
+  const { setActiveModal, setLeftPanel, leftPanelOpen, rightPanelOpen, setRightPanel, bottomPanelOpen, setBottomPanel, orgLogoBase64, editorView, setEditorView } = useUiStore()
   const { setValidating, setValidationResults, setSimulating, setSimulationResults, isValidating } = useValidationStore()
   const { getTopologySnapshot } = useCanvasStore()
 
@@ -62,6 +62,30 @@ export function TopToolbar() {
 
       <div className="flex-1" />
 
+      {/* View toggle: Topology / Rack */}
+      <div className="flex items-center bg-gray-800 rounded-lg p-0.5 gap-0.5">
+        <button
+          onClick={() => setEditorView('topology')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+            editorView === 'topology' ? 'bg-gray-700 text-white' : 'text-gray-500 hover:text-gray-300'
+          }`}
+        >
+          <Network className="w-3.5 h-3.5" />
+          Topology
+        </button>
+        <button
+          onClick={() => setEditorView('rack')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+            editorView === 'rack' ? 'bg-gray-700 text-white' : 'text-gray-500 hover:text-gray-300'
+          }`}
+        >
+          <Server className="w-3.5 h-3.5" />
+          Rack
+        </button>
+      </div>
+
+      <div className="w-px h-5 bg-gray-700" />
+
       {/* Panel toggles */}
       <div className="flex gap-1">
         <ToolbarIconButton
@@ -96,6 +120,15 @@ export function TopToolbar() {
       >
         <LayoutTemplate className="w-3.5 h-3.5" />
         Templates
+      </button>
+
+      <button
+        onClick={() => setActiveModal('proposal')}
+        className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white px-2 py-1 rounded hover:bg-gray-800 transition-colors"
+        title="Generate Proposal / BOM"
+      >
+        <FileText className="w-3.5 h-3.5" />
+        Proposal
       </button>
 
       <button
