@@ -9,11 +9,16 @@ const engine = new CapacityEngine()
 const capacityModule: FastifyPluginAsync = async (fastify) => {
   // GET /capacity/traffic-profiles — list all built-in profiles
   fastify.get('/traffic-profiles', async (_request, reply) => {
-    const profiles = await fastify.prisma.trafficProfile.findMany({
-      where: { isBuiltin: true },
-      orderBy: { name: 'asc' },
-    })
-    return reply.send({ data: profiles })
+    try {
+      const profiles = await fastify.prisma.trafficProfile.findMany({
+        where: { isBuiltin: true },
+        orderBy: { name: 'asc' },
+      })
+      return reply.send({ data: profiles })
+    } catch {
+      // Table may not exist yet pending migration
+      return reply.send({ data: [] })
+    }
   })
 
   // POST /capacity/calculate
@@ -36,22 +41,24 @@ const capacityModule: FastifyPluginAsync = async (fastify) => {
       Object.entries(body.trafficProfiles).map(([k, v]) => [k, v as TrafficProfile])
     )
 
-    // Also fetch built-in profiles from DB to supplement
-    const builtins = await fastify.prisma.trafficProfile.findMany({ where: { isBuiltin: true } })
-    for (const p of builtins) {
-      if (!profileMap.has(p.id)) {
-        profileMap.set(p.id, {
-          id: p.id,
-          name: p.name,
-          description: p.description ?? '',
-          avgBandwidthMbps: p.avgBandwidthMbps,
-          peakBandwidthMbps: p.peakBandwidthMbps,
-          concurrencyFactor: p.concurrencyFactor,
-          trafficType: p.trafficType as TrafficProfile['trafficType'],
-          burstDuration: p.burstDuration as TrafficProfile['burstDuration'],
-        })
+    // Also fetch built-in profiles from DB to supplement (table may not exist yet pending migration)
+    try {
+      const builtins = await fastify.prisma.trafficProfile.findMany({ where: { isBuiltin: true } })
+      for (const p of builtins) {
+        if (!profileMap.has(p.id)) {
+          profileMap.set(p.id, {
+            id: p.id,
+            name: p.name,
+            description: p.description ?? '',
+            avgBandwidthMbps: p.avgBandwidthMbps,
+            peakBandwidthMbps: p.peakBandwidthMbps,
+            concurrencyFactor: p.concurrencyFactor,
+            trafficType: p.trafficType as TrafficProfile['trafficType'],
+            burstDuration: p.burstDuration as TrafficProfile['burstDuration'],
+          })
+        }
       }
-    }
+    } catch { /* ignore — profiles from request body still used */ }
 
     const result = engine.calculate(body.topology as import('@gridhive/shared').TopologySnapshot, profileMap)
     return reply.send({ data: result })

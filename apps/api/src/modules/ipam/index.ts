@@ -11,6 +11,15 @@ function cidrHostCount(cidr: string): number {
 }
 
 const ipamModule: FastifyPluginAsync = async (fastify) => {
+  // Guard: catch Prisma P2021 "table does not exist" (migration not applied yet)
+  fastify.setErrorHandler((err, _req, reply) => {
+    const msg = (err as { message?: string }).message ?? ''
+    if (msg.includes('does not exist') || msg.includes('P2021') || msg.includes('findMany')) {
+      return reply.status(503).send({ error: 'IPAM database tables not yet migrated. Run: prisma migrate deploy' })
+    }
+    return reply.status(500).send({ error: msg || 'Internal server error' })
+  })
+
   // ──────────────────────────────────────────────────────────────
   // NAMESPACES
   // ──────────────────────────────────────────────────────────────
