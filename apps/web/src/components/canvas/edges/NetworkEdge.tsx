@@ -1,6 +1,8 @@
 import { BaseEdge, EdgeLabelRenderer, getBezierPath, type Edge, type EdgeProps } from '@xyflow/react'
 import type { ConnectionData, ConnectionType } from '@gridhive/shared'
 import { CONNECTION_TYPE_LABELS } from '@gridhive/shared'
+import { useUiStore } from '../../../stores/uiStore'
+import { useCanvasStore } from '../../../stores/canvasStore'
 
 interface ConnectionStyle {
   strokeColor: string
@@ -162,6 +164,13 @@ function getLabelLines(data: ConnectionData | undefined): string[] {
   return lines
 }
 
+const CAPACITY_COLORS: Record<string, { stroke: string; flow: string }> = {
+  critical: { stroke: '#ef4444', flow: '#f87171' },
+  warning:  { stroke: '#f97316', flow: '#fb923c' },
+  watch:    { stroke: '#eab308', flow: '#fde047' },
+  ok:       { stroke: '#22c55e', flow: '#4ade80' },
+}
+
 export function NetworkEdge({
   id, sourceX, sourceY, targetX, targetY,
   sourcePosition, targetPosition,
@@ -172,9 +181,40 @@ export function NetworkEdge({
     targetX, targetY, targetPosition,
   })
 
+  const canvasOverlay = useUiStore(s => s.canvasOverlay)
+  const capacityResult = useCanvasStore(s => s.capacityResult)
+
   const edgeData = data as ConnectionData | undefined
-  const style = getConnectionStyle(edgeData, selected ?? false)
-  const labelLines = getLabelLines(edgeData)
+  let style = getConnectionStyle(edgeData, selected ?? false)
+
+  // Capacity overlay: override edge color based on utilization status
+  if (canvasOverlay === 'capacity' && capacityResult && !selected) {
+    const linkUtil = capacityResult.linkUtilization.find(l => l.edgeId === id)
+    if (linkUtil) {
+      const capColor = CAPACITY_COLORS[linkUtil.status]
+      style = {
+        ...style,
+        strokeColor: capColor.stroke,
+        flowColor: capColor.flow,
+        strokeWidth: Math.max(style.strokeWidth, 2.5),
+      }
+    }
+  }
+
+  const labelLines = canvasOverlay === 'capacity' && capacityResult
+    ? (() => {
+        const linkUtil = capacityResult.linkUtilization.find(l => l.edgeId === id)
+        if (!linkUtil) return getLabelLines(edgeData)
+        const lines = []
+        if (linkUtil.peakUtilizationPct > 0) lines.push(`Peak: ${linkUtil.peakUtilizationPct}%`)
+        if (linkUtil.avgUtilizationPct > 0) lines.push(`Avg: ${linkUtil.avgUtilizationPct}%`)
+        const speedStr = linkUtil.linkSpeedMbps >= 1000
+          ? `${linkUtil.linkSpeedMbps / 1000}G`
+          : `${linkUtil.linkSpeedMbps}M`
+        lines.push(speedStr)
+        return lines
+      })()
+    : getLabelLines(edgeData)
   const filterId = `glow-${id}`
   const hasGlow = !selected && style.glowColor
 

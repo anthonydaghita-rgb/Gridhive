@@ -52,6 +52,10 @@ export async function buildApp() {
   await app.register(import('./modules/external/index.js'), { prefix: '' })
   await app.register(import('./modules/apikeys/index.js'), { prefix: '' })
   await app.register(import('./modules/favorites/index.js'), { prefix: '' })
+  // Phase 5
+  await app.register(import('./modules/lateralmovement/index.js'), { prefix: '/lm' })
+  await app.register(import('./modules/capacity/index.js'), { prefix: '/capacity' })
+  await app.register(import('./modules/ipam/index.js'), { prefix: '/ipam' })
 
   // Register config watcher before listen (Fastify v5 requires decorate before start)
   await app.register(async (instance) => {

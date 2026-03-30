@@ -5,6 +5,8 @@ import { PropertiesInspector } from '../panels/RightPanel/PropertiesInspector'
 import { ValidationPanel } from '../panels/BottomPanel/ValidationPanel'
 import { SimulationPanel } from '../panels/BottomPanel/SimulationPanel'
 import { CompliancePanel } from '../panels/BottomPanel/CompliancePanel'
+import { LateralMovementPanel } from '../panels/BottomPanel/LateralMovementPanel'
+import { CapacityPanel } from '../panels/BottomPanel/CapacityPanel'
 import { GridhiveCanvas } from '../canvas/GridhiveCanvas'
 import { NewProjectModal } from '../modals/NewProjectModal'
 import { TemplateLibraryModal } from '../modals/TemplateLibraryModal'
@@ -12,7 +14,7 @@ import { ExportModal } from '../modals/ExportModal'
 import { VersionHistoryModal } from '../modals/VersionHistoryModal'
 import { SaveVersionModal } from '../modals/SaveVersionModal'
 import { ProjectSettingsModal } from '../modals/ProjectSettingsModal'
-import { useUiStore } from '../../stores/uiStore'
+import { useUiStore, type BottomPanelTab } from '../../stores/uiStore'
 import { useProjectStore } from '../../stores/projectStore'
 import { api } from '../../lib/api'
 
@@ -49,15 +51,19 @@ export function AppShell() {
           {/* Bottom Panel */}
           {bottomPanelOpen && (
             <div className="h-64 border-t border-gray-800 bg-gray-900 flex flex-col">
-              <div className="flex border-b border-gray-800">
+              <div className="flex border-b border-gray-800 overflow-x-auto">
                 <BottomPanelTab tab="validation" label="Validation" />
                 <BottomPanelTab tab="simulation" label="Simulation" />
                 <BottomPanelTab tab="compliance" label="Compliance" />
+                <BottomPanelTab tab="lateral-movement" label="Lateral Movement" />
+                <BottomPanelTab tab="capacity" label="Capacity" />
               </div>
               <div className="flex-1 overflow-hidden">
                 {bottomPanelTab === 'validation' && <div className="h-full overflow-y-auto"><ValidationPanel /></div>}
                 {bottomPanelTab === 'simulation' && <div className="h-full overflow-y-auto"><SimulationPanel /></div>}
                 {bottomPanelTab === 'compliance' && <CompliancePanel />}
+                {bottomPanelTab === 'lateral-movement' && <LateralMovementPanel />}
+                {bottomPanelTab === 'capacity' && <CapacityPanel />}
               </div>
             </div>
           )}
@@ -82,12 +88,12 @@ export function AppShell() {
   )
 }
 
-function BottomPanelTab({ tab, label }: { tab: 'validation' | 'simulation' | 'compliance'; label: string }) {
+function BottomPanelTab({ tab, label }: { tab: BottomPanelTab; label: string }) {
   const { bottomPanelTab, setBottomPanelTab } = useUiStore()
   return (
     <button
       onClick={() => setBottomPanelTab(tab)}
-      className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+      className={`px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
         bottomPanelTab === tab
           ? 'border-blue-500 text-blue-400'
           : 'border-transparent text-gray-400 hover:text-white'

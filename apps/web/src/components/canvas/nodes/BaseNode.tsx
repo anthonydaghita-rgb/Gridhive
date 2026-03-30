@@ -3,6 +3,8 @@ import { Handle, Position, type Node, type NodeProps } from '@xyflow/react'
 import { AlertCircle, AlertTriangle, Info } from 'lucide-react'
 import type { DeviceData } from '@gridhive/shared'
 import { useValidationStore } from '../../../stores/validationStore'
+import { useUiStore } from '../../../stores/uiStore'
+import { useCanvasStore } from '../../../stores/canvasStore'
 
 interface BaseNodeProps extends NodeProps<Node<DeviceData>> {
   icon: ReactNode
@@ -16,6 +18,14 @@ export function BaseNode({ id, data, selected, icon, color, borderColor }: BaseN
   const isInPath = pathHighlightedNodes.includes(id)
   const isBlocked = pathBlockedNode === id
 
+  const canvasOverlay = useUiStore(s => s.canvasOverlay)
+  const lmResult = useCanvasStore(s => s.lmResult)
+
+  // Blast radius overlay: find this node's reachability tier
+  const lmReach = canvasOverlay === 'blast-radius' && lmResult
+    ? lmResult.reachability.find(r => r.nodeId === id)
+    : undefined
+
   let borderClass = borderColor || 'border-gray-700'
   if (selected) {
     borderClass = 'border-blue-400 ring-2 ring-blue-400/30'
@@ -23,6 +33,10 @@ export function BaseNode({ id, data, selected, icon, color, borderColor }: BaseN
     borderClass = 'border-red-500 ring-2 ring-red-500/40 animate-pulse'
   } else if (isInPath) {
     borderClass = 'border-blue-400 ring-2 ring-blue-400/40'
+  } else if (lmReach && lmReach.tier !== 'unreachable') {
+    if (lmReach.tier === 'primary') borderClass = 'border-red-500 ring-2 ring-red-500/40'
+    else if (lmReach.tier === 'secondary') borderClass = 'border-orange-500 ring-2 ring-orange-500/30'
+    else if (lmReach.tier === 'peripheral') borderClass = 'border-yellow-500 ring-2 ring-yellow-500/30'
   } else if (highlightState === 'error') {
     borderClass = 'border-red-500 ring-2 ring-red-500/30'
   } else if (highlightState === 'warning') {
@@ -52,6 +66,17 @@ export function BaseNode({ id, data, selected, icon, color, borderColor }: BaseN
       {badgeIcon && (
         <div className="absolute -top-2 -right-2 bg-gray-900 rounded-full p-0.5 border border-gray-700">
           {badgeIcon}
+        </div>
+      )}
+
+      {/* Blast radius overlay badge */}
+      {lmReach && lmReach.tier !== 'unreachable' && (
+        <div className={`absolute -top-2 -left-2 rounded-full px-1 py-0.5 text-[9px] font-bold leading-none border ${
+          lmReach.tier === 'primary' ? 'bg-red-900/90 text-red-300 border-red-600' :
+          lmReach.tier === 'secondary' ? 'bg-orange-900/90 text-orange-300 border-orange-600' :
+          'bg-yellow-900/90 text-yellow-300 border-yellow-600'
+        }`}>
+          {Math.round(lmReach.probability * 100)}%
         </div>
       )}
 

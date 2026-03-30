@@ -236,6 +236,20 @@ export interface DeviceData {
   discoveredAt?: string
   // Phase 4: monitoring status
   monitoringStatus?: 'online' | 'offline' | 'warning' | 'unconfigured'
+  // Phase 5: Rack diagram placement
+  rackId?: string
+  rackSlotStart?: number
+  rackUHeight?: number
+  rackFacing?: 'front' | 'rear'
+  rackPowerDraw?: number
+  rackPowerCircuit?: string
+  // Phase 5: Security / LM criticality
+  assetCriticality?: number   // 1-10
+  isCrownJewel?: boolean
+  // Phase 5: Capacity planning
+  trafficProfileId?: string
+  trafficProfileAvgMbps?: number
+  trafficProfilePeakMbps?: number
   [key: string]: unknown
 }
 
@@ -342,6 +356,8 @@ export interface TopologyMetadata {
   // Phase 4: VLAN visual system
   vlanColors?: Record<number, string>
   vlanZones?: VlanZone[]
+  // Phase 5: Rack diagram
+  racks?: RackDefinition[]
 }
 
 export interface TopologySnapshot {
@@ -687,4 +703,216 @@ export interface OrgApiCredential {
   testResult?: 'success' | 'failed' | null
   createdBy: string
   createdAt: Date
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 5: Rack Diagram (Pillar B)
+// ─────────────────────────────────────────────────────────────
+
+export interface RackDefinition {
+  id: string
+  name: string
+  label: string
+  totalUnits: number
+  width: 'standard-19' | 'wall-mount-10' | 'open-frame'
+  location?: string
+  pduIds?: string[]
+  powerCapacityWatts?: number
+  notes?: string
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 5: Lateral Movement Simulation (Pillar D)
+// ─────────────────────────────────────────────────────────────
+
+export type BlastRadiusTier = 'primary' | 'secondary' | 'peripheral' | 'unreachable'
+
+export interface LateralMovementHop {
+  nodeId: string
+  probability: number
+  hops: number
+  tier: BlastRadiusTier
+  attackPath: string[]   // ordered list of nodeIds from source to this node
+  criticalityScore: number
+}
+
+export interface LMRemediation {
+  rank: number
+  description: string
+  blastRadiusReduction: number   // points
+  blastRadiusPctReduction: number
+  affectedNodeIds: string[]
+}
+
+export interface LateralMovementResult {
+  sourceNodeId: string
+  blastRadiusScore: number       // 0-1000
+  maxPossibleScore: number
+  criticalAssetsAtRisk: string[] // nodeIds of criticality >= 8
+  devicesReachable: number
+  devicesProtected: number
+  totalDevices: number
+  reachability: LateralMovementHop[]
+  remediations: LMRemediation[]
+  lmsScore: number               // 0-100 network-wide susceptibility
+}
+
+export interface WorstCaseEntry {
+  rank: number
+  nodeId: string
+  blastRadiusScore: number
+  criticalAssetsAtRisk: string[]
+  devicesReachable: number
+}
+
+export interface WorstCaseResult {
+  entries: WorstCaseEntry[]
+  networkLmsScore: number
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 5: Capacity Planning (Pillar E)
+// ─────────────────────────────────────────────────────────────
+
+export type TrafficType =
+  | 'general-web'
+  | 'video-conferencing'
+  | 'voip'
+  | 'video-surveillance'
+  | 'file-server'
+  | 'remote-desktop'
+  | 'backup'
+  | 'database'
+  | 'streaming-media'
+  | 'industrial-scada'
+  | 'custom'
+
+export interface TrafficProfile {
+  id: string
+  name: string
+  description: string
+  avgBandwidthMbps: number
+  peakBandwidthMbps: number
+  concurrencyFactor: number
+  trafficType: TrafficType
+  burstDuration: 'continuous' | 'short' | 'long'
+  isBuiltin?: boolean
+}
+
+export interface LinkUtilization {
+  edgeId: string
+  sourceNodeId: string
+  targetNodeId: string
+  linkSpeedMbps: number
+  avgLoadMbps: number
+  peakLoadMbps: number
+  avgUtilizationPct: number
+  peakUtilizationPct: number
+  status: 'ok' | 'watch' | 'warning' | 'critical'
+}
+
+export interface CapacityBottleneck {
+  edgeId: string
+  description: string
+  peakUtilizationPct: number
+  recommendation: string
+}
+
+export interface QosRequirement {
+  nodeIds: string[]
+  trafficType: TrafficType
+  recommendation: string
+  priority: 'critical' | 'high' | 'medium' | 'low'
+}
+
+export interface CapacityResult {
+  linkUtilization: LinkUtilization[]
+  bottlenecks: CapacityBottleneck[]
+  qosRequirements: QosRequirement[]
+  totalBandwidthAvgMbps: number
+  totalBandwidthPeakMbps: number
+  overloadedEdgeIds: string[]   // > 90%
+  atRiskEdgeIds: string[]       // 80-90%
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 5: IPAM (Pillar A)
+// ─────────────────────────────────────────────────────────────
+
+export interface IpamNamespace {
+  id: string
+  orgId: string
+  name: string
+  description?: string
+  createdBy: string
+  createdAt: Date
+}
+
+export interface IpamSubnet {
+  id: string
+  namespaceId: string
+  supernetId?: string | null
+  cidr: string
+  name: string
+  vlanId?: number | null
+  vlanName?: string | null
+  gatewayIp?: string | null
+  dhcpServerIp?: string | null
+  dnsServerIp?: string | null
+  purpose?: string | null
+  status: 'active' | 'reserved' | 'deprecated' | 'planning'
+  associatedProjectIds: string[]
+  utilizationPct: number
+  createdBy: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface IpamAddress {
+  id: string
+  subnetId: string
+  ipAddress: string
+  hostname?: string | null
+  macAddress?: string | null
+  deviceType?: string | null
+  status: 'assigned' | 'reserved' | 'available' | 'conflict' | 'stale'
+  associatedProjectId?: string | null
+  associatedNodeId?: string | null
+  leaseType: 'static' | 'dhcp' | 'reserved'
+  lastSeen?: Date | null
+  notes?: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 5: Bill of Materials (Pillar C)
+// ─────────────────────────────────────────────────────────────
+
+export interface BOMLineItem {
+  vendorProfileId?: string
+  displayName: string
+  vendor: string
+  quantity: number
+  unitPriceHardware: number
+  totalPriceHardware: number
+  licenseDescription?: string
+  unitPriceLicenseAnnual?: number
+  unitPriceLicenseThreeYear?: number
+  totalPriceLicenseAnnual?: number
+  totalPriceLicenseThreeYear?: number
+  notes?: string
+  priceSource: 'msrp' | 'street' | 'pax8' | 'ingram' | 'manual' | 'estimated'
+}
+
+export interface BillOfMaterials {
+  lineItems: BOMLineItem[]
+  hardwareSubtotal: number
+  licensingAnnual: number
+  licensingThreeYear: number
+  grandTotalHardware: number
+  grandTotalThreeYear: number
+  currency: 'USD'
+  priceDate: Date
+  disclaimer: string
 }

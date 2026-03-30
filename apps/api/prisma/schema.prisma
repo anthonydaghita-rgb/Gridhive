@@ -101,6 +101,7 @@ model Organization {
   apiCredentials   OrgApiCredential[]
   apiKeys          OrgApiKey[]
   webhooks         OrgWebhook[]
+  ipamNamespaces   IpamNamespace[]
 
   @@map("organizations")
 }
@@ -490,3 +491,177 @@ model ProjectNodeLock {
   @@unique([projectId, nodeId])
   @@map("project_node_locks")
 }
+
+// ─────────────────────────────────────────────────────────────
+// Phase 5 Migration 1: IPAM
+// ─────────────────────────────────────────────────────────────
+
+model IpamNamespace {
+  id          String   @id @default(cuid())
+  orgId       String
+  name        String
+  description String?
+  createdBy   String
+  createdAt   DateTime @default(now())
+
+  org       Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  supernets IpamSupernet[]
+  subnets   IpamSubnet[]
+
+  @@index([orgId])
+  @@map("ipam_namespaces")
+}
+
+model IpamSupernet {
+  id          String   @id @default(cuid())
+  namespaceId String
+  cidr        String
+  name        String
+  description String?
+  purpose     String?
+  reserved    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  namespace IpamNamespace @relation(fields: [namespaceId], references: [id], onDelete: Cascade)
+  subnets   IpamSubnet[]
+
+  @@index([namespaceId])
+  @@map("ipam_supernets")
+}
+
+model IpamSubnet {
+  id                  String   @id @default(cuid())
+  namespaceId         String
+  supernetId          String?
+  cidr                String
+  name                String
+  vlanId              Int?
+  vlanName            String?
+  gatewayIp           String?
+  dhcpServerIp        String?
+  dnsServerIp         String?
+  purpose             String?
+  status              String   @default("active")
+  associatedProjectIds String[] @default([])
+  utilizationPct      Float    @default(0)
+  createdBy           String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  namespace IpamNamespace  @relation(fields: [namespaceId], references: [id], onDelete: Cascade)
+  supernet  IpamSupernet?  @relation(fields: [supernetId], references: [id])
+  addresses IpamAddress[]
+
+  @@index([namespaceId])
+  @@map("ipam_subnets")
+}
+
+model IpamAddress {
+  id                  String    @id @default(cuid())
+  subnetId            String
+  ipAddress           String
+  hostname            String?
+  macAddress          String?
+  deviceType          String?
+  status              String    @default("available")
+  associatedProjectId String?
+  associatedNodeId    String?
+  leaseType           String    @default("static")
+  lastSeen            DateTime?
+  notes               String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  subnet IpamSubnet @relation(fields: [subnetId], references: [id], onDelete: Cascade)
+
+  @@unique([subnetId, ipAddress])
+  @@index([subnetId])
+  @@index([ipAddress])
+  @@map("ipam_addresses")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 5 Migration 2: Pricing & Proposals (Pillar C)
+// ─────────────────────────────────────────────────────────────
+
+model DevicePricing {
+  id              String   @id @default(cuid())
+  vendorProfileId String   @unique
+  msrp            Float?
+  streetPrice     Float?
+  pax8Price       Float?
+  ingramPrice     Float?
+  lastUpdated     DateTime @default(now())
+  currency        String   @default("USD")
+  notes           String?
+
+  @@index([vendorProfileId])
+  @@map("device_pricing")
+}
+
+model DeviceLicensing {
+  id                  String  @id @default(cuid())
+  vendorProfileId     String
+  licenseType         String
+  licenseDescription  String
+  annualCostUsd       Float?
+  threeYearCostUsd    Float?
+  notes               String?
+
+  @@index([vendorProfileId])
+  @@map("device_licensing")
+}
+
+model OrgProposalSettings {
+  id               String   @id @default(cuid())
+  orgId            String   @unique
+  hardwareMarkupPct Float   @default(15)
+  laborRatePerHour Float    @default(150)
+  defaultTermsText String?
+  primaryColor     String   @default("#3b82f6")
+  secondaryColor   String   @default("#1e40af")
+  updatedAt        DateTime @updatedAt
+
+  @@map("org_proposal_settings")
+}
+
+model ProposalVersion {
+  id              String   @id @default(cuid())
+  projectId       String
+  orgId           String
+  createdBy       String
+  createdAt       DateTime @default(now())
+  proposalData    Json
+  clientName      String?
+  validThrough    DateTime?
+  proposalNumber  Int
+  totalHardware   Float?
+  total3yr        Float?
+
+  @@index([projectId])
+  @@index([orgId])
+  @@map("proposal_versions")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Phase 5 Migration 3: Traffic Profiles (Pillar E)
+// ─────────────────────────────────────────────────────────────
+
+model TrafficProfile {
+  id                String   @id @default(cuid())
+  orgId             String?
+  name              String
+  description       String?
+  avgBandwidthMbps  Float
+  peakBandwidthMbps Float
+  concurrencyFactor Float    @default(0.7)
+  trafficType       String
+  burstDuration     String   @default("continuous")
+  isBuiltin         Boolean  @default(false)
+  createdBy         String?
+  createdAt         DateTime @default(now())
+
+  @@index([orgId])
+  @@map("traffic_profiles")
+}
+

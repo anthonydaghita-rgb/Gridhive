@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import type { Node, Edge, Viewport } from '@xyflow/react'
-import type { DeviceData, ConnectionData, TopologySnapshot, ConnectionType } from '@gridhive/shared'
+import type { DeviceData, ConnectionData, TopologySnapshot, ConnectionType, LateralMovementResult, CapacityResult } from '@gridhive/shared'
 
 type DeviceNode = Node<DeviceData>
 type ConnectionEdge = Edge<ConnectionData>
@@ -61,6 +61,12 @@ interface CanvasStore {
   getTopologySnapshot: () => TopologySnapshot
   clearCanvas: () => void
   captureCanvasThumbnail: () => Promise<string | null>
+
+  // Phase 5 overlay results
+  lmResult: LateralMovementResult | null
+  capacityResult: CapacityResult | null
+  setLmResult: (result: LateralMovementResult | null) => void
+  setCapacityResult: (result: CapacityResult | null) => void
 }
 
 export const useCanvasStore = create<CanvasStore>()(
@@ -72,6 +78,8 @@ export const useCanvasStore = create<CanvasStore>()(
     selectedEdgeId: null,
     selectedNodeIds: [],
     fitViewNodeIds: null,
+    lmResult: null,
+    capacityResult: null,
 
     setNodes: (nodes) => set(state => ({
       nodes: typeof nodes === 'function' ? nodes(state.nodes) : nodes,
@@ -134,6 +142,9 @@ export const useCanvasStore = create<CanvasStore>()(
     },
 
     clearCanvas: () => set({ nodes: [], edges: [], selectedNodeId: null, selectedEdgeId: null, selectedNodeIds: [] }),
+
+    setLmResult: (result) => set({ lmResult: result }),
+    setCapacityResult: (result) => set({ capacityResult: result }),
 
     captureCanvasThumbnail: async () => {
       try {
