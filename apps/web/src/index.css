@@ -98,6 +98,6 @@
 
 /* Data-flow animation for network edges */
 @keyframes gridhive-flow {
-  from { stroke-dashoffset: 32; }
+  from { stroke-dashoffset: 20; }
   to   { stroke-dashoffset: 0; }
 }

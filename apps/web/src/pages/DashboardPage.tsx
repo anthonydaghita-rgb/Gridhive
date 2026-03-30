@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import {
   Plus, Search, Folder, FolderPlus, MoreHorizontal, Trash2, Copy, Pencil,
   FolderOpen, AlertCircle, ChevronRight, Settings, LogOut, Shield,
@@ -226,8 +227,12 @@ export function DashboardPage() {
     try {
       await api.delete(`/projects/${projectId}`)
       setProjects(prev => prev.filter(p => p.id !== projectId))
+      toast.success('Project moved to trash')
     } catch (err) {
       console.error(err)
+      toast.error('Failed to delete project', {
+        description: err instanceof Error ? err.message : 'Unknown error',
+      })
     }
   }
 

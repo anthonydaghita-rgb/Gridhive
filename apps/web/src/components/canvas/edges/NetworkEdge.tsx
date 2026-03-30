@@ -219,12 +219,12 @@ export function NetworkEdge({
           d={edgePath}
           fill="none"
           stroke={style.flowColor}
-          strokeWidth={Math.max(1, (style.strokeWidth ?? 2) * 0.6)}
-          strokeDasharray="12,20"
+          strokeWidth={Math.max(2, (style.strokeWidth ?? 2) * 0.9)}
+          strokeDasharray="8,12"
           strokeLinecap="round"
           style={{
             animation: `gridhive-flow ${flowDuration} linear infinite`,
-            opacity: 0.75,
+            opacity: 0.92,
             pointerEvents: 'none',
           }}
         />

@@ -1,10 +1,34 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import type { Node, Edge, Viewport } from '@xyflow/react'
-import type { DeviceData, ConnectionData, TopologySnapshot } from '@gridhive/shared'
+import type { DeviceData, ConnectionData, TopologySnapshot, ConnectionType } from '@gridhive/shared'
 
 type DeviceNode = Node<DeviceData>
 type ConnectionEdge = Edge<ConnectionData>
+
+// Infer the best connectionType from legacy edge data that only has mediaType/vlanTag/etc.
+function inferConnectionType(data: Record<string, unknown>): ConnectionType {
+  const mediaType = data.mediaType as string | undefined
+  const trunkVlans = data.trunkVlans
+  const vlanTag = data.vlanTag
+  const poe = data.poe
+
+  if (mediaType === 'wan') return 'internet-access'
+  if (trunkVlans && Array.isArray(trunkVlans) && (trunkVlans as unknown[]).length > 0) return 'trunk-8021q'
+  if (mediaType === 'fiber' || mediaType === 'sfp') return 'ethernet-fiber'
+  if (mediaType === 'wireless') return 'wifi'
+  if (mediaType === 'vpn') return 'site-to-site-ipsec'
+  if (poe && vlanTag) return 'poe'
+  if (vlanTag) return 'access-port'
+  return 'ethernet-copper'
+}
+
+// Ensure every edge has type:'network' and a connectionType so NetworkEdge renders correctly
+function normalizeEdge(edge: Edge): ConnectionEdge {
+  const data = (edge.data ?? {}) as Record<string, unknown>
+  const connectionType = (data.connectionType as ConnectionType | undefined) ?? inferConnectionType(data)
+  return { ...edge, type: 'network', data: { ...data, connectionType } } as ConnectionEdge
+}
 
 interface CanvasStore {
   nodes: DeviceNode[]
@@ -95,7 +119,7 @@ export const useCanvasStore = create<CanvasStore>()(
 
     loadTopology: (snapshot) => set({
       nodes: snapshot.nodes as DeviceNode[],
-      edges: snapshot.edges as ConnectionEdge[],
+      edges: (snapshot.edges as Edge[]).map(normalizeEdge),
       viewport: snapshot.viewport,
     }),
 
