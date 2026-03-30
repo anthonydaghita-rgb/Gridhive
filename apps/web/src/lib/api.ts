@@ -20,10 +20,11 @@ function getToken(): string | null {
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const token = getToken()
+  const hasBody = options?.body != null
   const response = await fetch(`${API_BASE}${path}`, {
     credentials: 'include',
     headers: {
-      'Content-Type': 'application/json',
+      ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,
     },
