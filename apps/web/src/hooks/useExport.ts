@@ -6,8 +6,10 @@ import { useAuthStore } from '../stores/authStore'
 import type { ValidationResult } from '@gridhive/shared'
 import type { PDFOptions } from '../components/export/PDFGenerator'
 
+export type { PDFOptions }
+
 export function useExport() {
-  const { getTopologySnapshot, nodes } = useCanvasStore()
+  const { getTopologySnapshot, nodes, lmResult, capacityResult } = useCanvasStore()
   const { validationResults, simulationResults, lastValidatedAt, lastSimulatedAt } = useValidationStore()
   const { currentProject } = useProjectStore()
   const { user } = useAuthStore()
@@ -76,7 +78,7 @@ export function useExport() {
     setIsGeneratingPDF(true)
     try {
       const topology = getTopologySnapshot()
-      const canvasImageBase64 = await useCanvasStore.getState().captureCanvasThumbnail()
+      const canvasImageBase64 = await useCanvasStore.getState().captureCanvasHighRes()
       const { generatePDF } = await import('../components/export/PDFGenerator')
 
       await generatePDF({
@@ -90,6 +92,8 @@ export function useExport() {
         lastValidatedAt,
         lastSimulatedAt,
         canvasImageBase64: canvasImageBase64 ?? undefined,
+        lmResult,
+        capacityResult,
       }, options)
     } catch (err) {
       console.error('PDF generation failed:', err)

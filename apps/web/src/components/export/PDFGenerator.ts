@@ -1,10 +1,12 @@
-import type { TopologySnapshot, ValidationResult, SimulationResult, SimulationTest } from '@gridhive/shared'
+import type { TopologySnapshot, ValidationResult, SimulationResult, SimulationTest, LateralMovementResult, CapacityResult } from '@gridhive/shared'
 import { PROTOCOL_LABELS, PROTOCOL_DESCRIPTIONS } from '@gridhive/shared'
 
 export interface PDFOptions {
   includeValidation: boolean
   includeSimulation: boolean
   includeSubnet: boolean
+  includeLateralMovement: boolean
+  includeCapacity: boolean
   paperSize: 'Letter' | 'A4'
 }
 
@@ -19,6 +21,8 @@ interface ReportContext {
   lastValidatedAt: Date | null
   lastSimulatedAt: Date | null
   canvasImageBase64?: string
+  lmResult?: LateralMovementResult | null
+  capacityResult?: CapacityResult | null
 }
 
 const COLORS = {
@@ -219,24 +223,23 @@ function buildDeviceInventory(ctx: ReportContext, validationResults: ValidationR
 }
 
 function buildConnectionInventory(ctx: ReportContext) {
-  const headers = ['Source', 'Destination', 'Media', 'Speed', 'VLAN/Trunk', 'Protocols', 'Notes']
+  const headers = ['Source', 'Destination', 'Connection Type', 'Speed', 'VLAN/Trunk', 'Notes']
   const rows = ctx.topology.edges.map(edge => {
     const source = ctx.topology.nodes.find(n => n.id === edge.source)
     const target = ctx.topology.nodes.find(n => n.id === edge.target)
-    const protocols = (edge.data.protocols || []).map(p => PROTOCOL_LABELS[p] || p).join(', ') || ''
+    const connType = (edge.data as Record<string, unknown>).connectionType as string | undefined
     const vlanInfo = edge.data.vlanTag
       ? `VLAN ${edge.data.vlanTag}`
       : edge.data.trunkVlans?.length
-      ? `Trunk: ${edge.data.trunkVlans.join(',')}`
+      ? `Trunk: ${(edge.data.trunkVlans as number[]).join(', ')}`
       : ''
 
     return [
       { text: source?.data.hostname || edge.source, style: 'tableCell' },
       { text: target?.data.hostname || edge.target, style: 'tableCell' },
-      { text: edge.data.mediaType || 'copper', style: 'tableCell' },
-      { text: edge.data.speed || '1G', style: 'tableCell' },
+      { text: connType || edge.data.mediaType || 'ethernet-copper', style: 'tableCell' },
+      { text: (edge.data as Record<string, unknown>).speed as string || '1G', style: 'tableCell' },
       { text: vlanInfo, style: 'tableCell' },
-      { text: protocols, style: 'tableCell' },
       { text: edge.data.notes || '', style: 'tableCell' },
     ]
   })
@@ -246,7 +249,7 @@ function buildConnectionInventory(ctx: ReportContext) {
     {
       table: {
         headerRows: 1,
-        widths: [80, 80, 45, 40, 65, 70, '*'],
+        widths: [80, 80, 100, 40, 65, '*'],
         body: [
           headers.map(h => ({ text: h, style: 'columnHeader' })),
           ...rows,
@@ -261,6 +264,152 @@ function buildConnectionInventory(ctx: ReportContext) {
       },
     },
   ]
+}
+
+function buildLateralMovementSection(ctx: ReportContext) {
+  const lm = ctx.lmResult
+  const content: object[] = [
+    { text: 'Lateral Movement Risk Analysis', style: 'sectionHeader', pageBreak: 'before' },
+  ]
+
+  if (!lm) {
+    content.push({ text: 'No lateral movement simulation has been run. Open the Lateral Movement tab and run a simulation before exporting.', style: 'bodyText', margin: [0, 8] })
+    return content
+  }
+
+  content.push({
+    table: {
+      widths: [150, '*'],
+      body: [
+        [{ text: 'Source Node', style: 'tableHeader' }, { text: ctx.topology.nodes.find(n => n.id === lm.sourceNodeId)?.data?.label as string || lm.sourceNodeId, style: 'tableCell' }],
+        [{ text: 'Blast Radius Score', style: 'tableHeader' }, { text: `${lm.blastRadiusScore} / 100`, style: 'tableCell', bold: true }],
+        [{ text: 'LMS Network Score', style: 'tableHeader' }, { text: `${lm.lmsScore} / 100`, style: 'tableCell' }],
+        [{ text: 'Reachable Devices', style: 'tableHeader' }, { text: lm.reachability.filter(r => r.tier !== 'unreachable').length.toString(), style: 'tableCell' }],
+        [{ text: 'Critical Assets at Risk', style: 'tableHeader' }, { text: lm.criticalAssetsAtRisk.length.toString(), style: 'tableCell', color: lm.criticalAssetsAtRisk.length > 0 ? COLORS.errorRed : COLORS.bodyText }],
+      ],
+    },
+    layout: { hLineWidth: () => 0.5, vLineWidth: () => 0, hLineColor: () => COLORS.border, fillColor: (i: number) => i % 2 === 0 ? COLORS.rowAlt : null },
+    margin: [0, 0, 0, 12],
+  })
+
+  const reached = lm.reachability.filter(r => r.tier !== 'unreachable').sort((a, b) => b.probability - a.probability)
+  if (reached.length > 0) {
+    content.push({ text: 'Reachable Devices', style: 'subSectionHeader', margin: [0, 8, 0, 4] })
+    content.push({
+      table: {
+        headerRows: 1,
+        widths: [140, 60, 40, '*'],
+        body: [
+          [{ text: 'Device', style: 'columnHeader' }, { text: 'Tier', style: 'columnHeader' }, { text: 'Hops', style: 'columnHeader' }, { text: 'Probability', style: 'columnHeader' }],
+          ...reached.slice(0, 20).map(r => {
+            const node = ctx.topology.nodes.find(n => n.id === r.nodeId)
+            const tierColor = r.tier === 'primary' ? COLORS.errorRed : r.tier === 'secondary' ? COLORS.warningAmber : COLORS.infoBlue
+            return [
+              { text: node?.data?.label as string || r.nodeId, style: 'tableCell' },
+              { text: r.tier.toUpperCase(), style: 'tableCell', color: tierColor, bold: true },
+              { text: r.hops.toString(), style: 'tableCell' },
+              { text: `${Math.round(r.probability * 100)}%`, style: 'tableCell' },
+            ]
+          }),
+        ],
+      },
+      layout: { hLineWidth: () => 0.5, vLineWidth: (i: number) => i === 0 || i === 4 ? 0.5 : 0, hLineColor: () => COLORS.border, vLineColor: () => COLORS.border, fillColor: (row: number) => row === 0 ? COLORS.headerBg : row % 2 === 0 ? COLORS.rowAlt : null },
+    })
+  }
+
+  if (lm.remediations.length > 0) {
+    content.push({ text: 'Recommended Remediations', style: 'subSectionHeader', margin: [0, 12, 0, 4] })
+    for (const rem of lm.remediations) {
+      content.push({
+        table: {
+          widths: ['*'],
+          body: [[{
+            stack: [
+              { text: `#${rem.rank} — Remediation`, bold: true, fontSize: 9, color: COLORS.primary },
+              { text: rem.description, fontSize: 8, color: COLORS.bodyText, margin: [0, 2, 0, 0] },
+              { text: `Blast radius reduction: ${rem.blastRadiusPctReduction}%`, fontSize: 8, color: COLORS.subtext, margin: [0, 2, 0, 0] },
+            ],
+            margin: [6, 4],
+          }]],
+        },
+        layout: { hLineWidth: (i: number) => i === 0 || i === 1 ? 0.5 : 0, vLineWidth: (i: number) => i === 0 || i === 1 ? 0.5 : 0, hLineColor: () => COLORS.border, vLineColor: () => COLORS.border },
+        margin: [0, 2],
+      })
+    }
+  }
+
+  return content
+}
+
+function buildCapacitySection(ctx: ReportContext) {
+  const cap = ctx.capacityResult
+  const content: object[] = [
+    { text: 'Capacity Planning Analysis', style: 'sectionHeader', pageBreak: 'before' },
+  ]
+
+  if (!cap) {
+    content.push({ text: 'No capacity analysis has been run. Open the Capacity tab and run an analysis before exporting.', style: 'bodyText', margin: [0, 8] })
+    return content
+  }
+
+  content.push({
+    table: {
+      widths: [150, '*'],
+      body: [
+        [{ text: 'Total Avg Bandwidth', style: 'tableHeader' }, { text: formatMbps(cap.totalBandwidthAvgMbps), style: 'tableCell' }],
+        [{ text: 'Total Peak Bandwidth', style: 'tableHeader' }, { text: formatMbps(cap.totalBandwidthPeakMbps), style: 'tableCell' }],
+        [{ text: 'Overloaded Links', style: 'tableHeader' }, { text: cap.overloadedEdgeIds.length.toString(), style: 'tableCell', color: cap.overloadedEdgeIds.length > 0 ? COLORS.errorRed : COLORS.bodyText }],
+        [{ text: 'At-Risk Links', style: 'tableHeader' }, { text: cap.atRiskEdgeIds.length.toString(), style: 'tableCell', color: cap.atRiskEdgeIds.length > 0 ? COLORS.warningAmber : COLORS.bodyText }],
+      ],
+    },
+    layout: { hLineWidth: () => 0.5, vLineWidth: () => 0, hLineColor: () => COLORS.border, fillColor: (i: number) => i % 2 === 0 ? COLORS.rowAlt : null },
+    margin: [0, 0, 0, 12],
+  })
+
+  const nonOk = cap.linkUtilization.filter(l => l.status !== 'ok').sort((a, b) => b.peakUtilizationPct - a.peakUtilizationPct)
+  if (nonOk.length > 0) {
+    content.push({ text: 'Link Utilization Issues', style: 'subSectionHeader', margin: [0, 8, 0, 4] })
+    content.push({
+      table: {
+        headerRows: 1,
+        widths: [130, 130, 50, 50, 50, 60],
+        body: [
+          [{ text: 'Source', style: 'columnHeader' }, { text: 'Destination', style: 'columnHeader' }, { text: 'Speed', style: 'columnHeader' }, { text: 'Avg %', style: 'columnHeader' }, { text: 'Peak %', style: 'columnHeader' }, { text: 'Status', style: 'columnHeader' }],
+          ...nonOk.slice(0, 15).map(l => {
+            const src = ctx.topology.nodes.find(n => n.id === l.sourceNodeId)
+            const tgt = ctx.topology.nodes.find(n => n.id === l.targetNodeId)
+            const stColor = l.status === 'critical' ? COLORS.errorRed : l.status === 'warning' ? COLORS.warningAmber : '#ca8a04'
+            return [
+              { text: src?.data?.label as string || l.sourceNodeId, style: 'tableCell' },
+              { text: tgt?.data?.label as string || l.targetNodeId, style: 'tableCell' },
+              { text: formatMbps(l.linkSpeedMbps), style: 'tableCell' },
+              { text: `${l.avgUtilizationPct}%`, style: 'tableCell' },
+              { text: `${l.peakUtilizationPct}%`, style: 'tableCell', bold: true, color: stColor },
+              { text: l.status.toUpperCase(), style: 'tableCell', color: stColor, bold: true },
+            ]
+          }),
+        ],
+      },
+      layout: { hLineWidth: () => 0.5, vLineWidth: (i: number) => i === 0 || i === 6 ? 0.5 : 0, hLineColor: () => COLORS.border, vLineColor: () => COLORS.border, fillColor: (row: number) => row === 0 ? COLORS.headerBg : row % 2 === 0 ? COLORS.rowAlt : null },
+    })
+  }
+
+  if (cap.bottlenecks.length > 0) {
+    content.push({ text: 'Bottleneck Recommendations', style: 'subSectionHeader', margin: [0, 12, 0, 4] })
+    for (const b of cap.bottlenecks) {
+      content.push({
+        table: { widths: ['*'], body: [[{ stack: [{ text: b.description, bold: true, fontSize: 9, color: COLORS.warningAmber }, { text: b.recommendation, fontSize: 8, color: COLORS.bodyText, margin: [0, 2, 0, 0] }], margin: [6, 4] }]] },
+        layout: { hLineWidth: (i: number) => i === 0 || i === 1 ? 0.5 : 0, vLineWidth: (i: number) => i === 0 || i === 1 ? 0.5 : 0, hLineColor: () => COLORS.border, vLineColor: () => COLORS.border },
+        margin: [0, 2],
+      })
+    }
+  }
+
+  return content
+}
+
+function formatMbps(mbps: number): string {
+  return mbps >= 1000 ? `${(mbps / 1000).toFixed(1)} Gbps` : `${mbps.toFixed(0)} Mbps`
 }
 
 function buildProtocolReference(ctx: ReportContext) {
@@ -520,6 +669,14 @@ export async function generatePDF(ctx: ReportContext, options: PDFOptions): Prom
 
   if (options.includeSimulation) {
     content.push(...buildSimulationReport(ctx))
+  }
+
+  if (options.includeLateralMovement) {
+    content.push(...buildLateralMovementSection(ctx))
+  }
+
+  if (options.includeCapacity) {
+    content.push(...buildCapacitySection(ctx))
   }
 
   const pageSize = options.paperSize === 'A4' ? 'A4' : 'LETTER'

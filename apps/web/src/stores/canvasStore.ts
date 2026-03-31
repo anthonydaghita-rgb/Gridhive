@@ -61,6 +61,7 @@ interface CanvasStore {
   getTopologySnapshot: () => TopologySnapshot
   clearCanvas: () => void
   captureCanvasThumbnail: () => Promise<string | null>
+  captureCanvasHighRes: () => Promise<string | null>
 
   // Phase 5 overlay results
   lmResult: LateralMovementResult | null
@@ -160,6 +161,25 @@ export const useCanvasStore = create<CanvasStore>()(
           height: el.clientHeight,
         })
         return canvas.toDataURL('image/jpeg', 0.7)
+      } catch {
+        return null
+      }
+    },
+
+    captureCanvasHighRes: async () => {
+      try {
+        const el = document.getElementById('gridhive-canvas-capture')
+        if (!el) return null
+        const { default: html2canvas } = await import('html2canvas')
+        const canvas = await html2canvas(el, {
+          backgroundColor: '#030712',
+          scale: 2,           // 2× device pixels → crisp text and edges
+          useCORS: true,
+          logging: false,
+          width: el.clientWidth,
+          height: el.clientHeight,
+        })
+        return canvas.toDataURL('image/png') // lossless — no JPEG artefacts
       } catch {
         return null
       }

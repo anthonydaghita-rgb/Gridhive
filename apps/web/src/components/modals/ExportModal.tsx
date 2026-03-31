@@ -13,6 +13,8 @@ export function ExportModal() {
     includeValidation: true,
     includeSimulation: true,
     includeSubnet: true,
+    includeLateralMovement: true,
+    includeCapacity: true,
     paperSize: 'Letter' as 'Letter' | 'A4',
   })
   const [activeTab, setActiveTab] = useState<'formats' | 'pdf' | 'device-config'>('formats')
@@ -117,6 +119,24 @@ export function ExportModal() {
                   className="w-4 h-4 accent-blue-500"
                 />
                 <span className="text-sm text-gray-300">Include subnet reference</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={pdfOptions.includeLateralMovement}
+                  onChange={e => setPdfOptions(p => ({ ...p, includeLateralMovement: e.target.checked }))}
+                  className="w-4 h-4 accent-blue-500"
+                />
+                <span className="text-sm text-gray-300">Include lateral movement analysis</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={pdfOptions.includeCapacity}
+                  onChange={e => setPdfOptions(p => ({ ...p, includeCapacity: e.target.checked }))}
+                  className="w-4 h-4 accent-blue-500"
+                />
+                <span className="text-sm text-gray-300">Include capacity planning analysis</span>
               </label>
 
               <div>
